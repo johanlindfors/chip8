@@ -329,8 +329,7 @@ pub const CPU = struct {
 
     // 0xCXNN
     fn opRandom(self: *Self, x: u16, nn: u8) u16 {
-        // TODO: Use proper random
-        var random : u8 = rnd.random().int(u8) & nn;
+        var random = rnd.random().int(u8);
         self.registers[x] = random & nn;
         return 164;
     }
