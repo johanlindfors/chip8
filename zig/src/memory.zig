@@ -39,4 +39,8 @@ pub const Memory = struct {
     pub fn get(self: *Self, addr: u16) u8 {
         return self.ram[addr];
     }
+
+    pub fn set(self: *Self, addr: u16, value: u8) void {
+        self.ram[addr] = value;
+    }
 };
