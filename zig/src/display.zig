@@ -27,25 +27,34 @@ pub const Display = struct {
     }
 
     pub fn draw(self: *Self) void {
-        self.frameBuffer[892] = true;
         _ = sdl.SDL_SetRenderDrawColor(self.renderer, 0x00, 0x00, 0x00, 0xff);
         _ = sdl.SDL_RenderClear(self.renderer);
 
         _ = sdl.SDL_SetRenderDrawColor(self.renderer, 0xff, 0xff, 0xff, 0xff);
         var y: usize = 0;
-        while (y < 32) {
+        while (y < 32) : (y += 1) {
             var x: usize = 0;
-            while (x < 64) {
+            while (x < 64) : (x += 1) {
                 if(self.frameBuffer[y * 64 + x]){
                     var rect = sdl.SDL_Rect{ .x = @intCast(i16, x * 10), .y = @intCast(i16, y * 10), .w = 10, .h = 10 };
                     _ = sdl.SDL_RenderFillRect(self.renderer, &rect);
                 }
-                x += 1;
             }
-            y += 1;
         }
         _ = sdl.SDL_RenderPresent(self.renderer);
-        self.drawFlag = false;
+        self.setDrawFlag(false);
+    }
+
+    pub fn clear(self: *Self) void {
+        self.frameBuffer = [_]bool{false} ** 2048;
+    }
+
+    pub fn setDrawFlag(self: *Self, value: bool) void {
+        self.drawFlag = value;
+    }
+
+    pub fn flipPixel(self: *Self, position: usize) void {
+        self.frameBuffer[position] = !self.frameBuffer[position];
     }
 
     pub fn cleanUp(self: *Self) void {

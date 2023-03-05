@@ -4,10 +4,14 @@ const sdl = @cImport({
 
 const Display = @import("display.zig").Display;
 const Keyboard = @import("keyboard.zig").Keyboard;
+const Audio = @import("audio.zig").Audio;
+const CPU = @import("cpu.zig").CPU;
 
 pub const Emulator = struct {
     display: Display,
     keyboard: Keyboard,
+    audio: Audio,
+    cpu: CPU,
 
     const Self = @This();
 
@@ -15,15 +19,18 @@ pub const Emulator = struct {
         return Emulator{
             .display = Display.init(),
             .keyboard = Keyboard.init(),
+            .audio = Audio {},
+            .cpu = CPU.init(),
         };
     }
 
-    pub fn run(self: *Self) void {
+    pub fn run(self: *Self, program: []u8, length: usize) void {
         
+        self.cpu.memory.loadProgram(0x0200, program, length);
+
         mainloop: while (true) {
             self.keyboard.handleInput();
-            self.display.draw();
-
+            
             var sdl_event: sdl.SDL_Event = undefined;
             while (sdl.SDL_PollEvent(&sdl_event) != 0) {
                 switch (sdl_event.type) {
@@ -38,6 +45,10 @@ pub const Emulator = struct {
                     sdl.SDL_QUIT => break :mainloop,
                     else => {},
                 }
+            }
+            self.cpu.tick(&self.display, &self.keyboard, &self.audio);
+            if(self.display.drawFlag) {
+                self.display.draw();
             }
         }
 
