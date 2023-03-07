@@ -6,10 +6,11 @@ namespace Chip8 {
     class Display;
     class Keyboard;
     class Audio;
+    class Memory;
 
     class Emulator {
         public:
-            Emulator(char* data, int length);
+            Emulator(std::shared_ptr<Memory>);
             ~Emulator();
             void run();
 

@@ -3,10 +3,11 @@
 #include "chip8/memory.h"
 #include "chip8/cpu.h"
 
-int main() {
-    auto emulator = std::make_unique<Chip8::Emulator>(nullptr, 0);
+int main(int argc, char* argv[]) {
+    char* romFilename = argv[1];
+    auto memory = std::make_shared<Chip8::Memory>();
+    memory->loadROM(romFilename);
+    auto emulator = std::make_unique<Chip8::Emulator>(memory);
     emulator->run(); 
-    // auto sdl = SDL_Init(SDL_INIT_EVERYTHING);
-    // SDL_Quit();
     emulator.reset();
 }

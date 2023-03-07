@@ -10,7 +10,7 @@ namespace Chip8 {
                 SDL_DestroyWindow( _window );
             }
             void init();
-            void flipPixel(int x, int y);
+            void flipPixel(int index);
             void setDrawFlag(bool value);
             bool getDrawFlag();
 
@@ -21,7 +21,7 @@ namespace Chip8 {
             bool _drawFlag;
             bool _frameBuffer[64*32];
             SDL_Window* _window = nullptr;
-            SDL_Surface* _screenSurface = nullptr;
+            SDL_Renderer* _renderer = nullptr;
 
     };
 }

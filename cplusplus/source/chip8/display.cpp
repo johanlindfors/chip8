@@ -10,26 +10,16 @@ void Display::init()
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
         //Create window
-        _window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 320, SDL_WINDOW_SHOWN );
-        if( _window == NULL )
+        SDL_CreateWindowAndRenderer(640, 320, SDL_WINDOW_SHOWN, &_window, &_renderer);
+        if( _window == NULL || _renderer == NULL)
         {
-            printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-        } else {
-            //Get window surface
-            _screenSurface = SDL_GetWindowSurface( _window );
-
-            //Fill the surface white
-            SDL_FillRect( _screenSurface, NULL, SDL_MapRGB( _screenSurface->format, 0xFF, 0xFF, 0xFF ) );
-            
-            //Update the surface
-            SDL_UpdateWindowSurface( _window );
+            printf( "Window or renderer could not be created! SDL_Error: %s\n", SDL_GetError() );
         }
     }
 }
 
-void Display::flipPixel(int x, int y)
+void Display::flipPixel(int index)
 {
-    auto index = y * 64 + x;
     _frameBuffer[index] = !_frameBuffer[index];
 }
 
@@ -45,10 +35,26 @@ bool Display::getDrawFlag()
 
 void Display::clear()
 {
-
+    for(int i = 0; i < 64*32; i++){
+        _frameBuffer[i] = false;
+    }
 }
 
 void Display::draw()
 {
+    SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderClear(_renderer);
 
+    SDL_SetRenderDrawColor(_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    for (int y = 0; y < 32; y++) {
+        for(int x = 0; x < 64; x++) {
+            if(_frameBuffer[y * 64 + x]) {
+                SDL_Rect rect = { x: x*10, y: y*10, w: 10, h: 10};
+                SDL_RenderFillRect(_renderer, &rect);
+            }
+        }
+    }
+    
+    SDL_RenderPresent(_renderer);
+    _drawFlag = false;
 }
