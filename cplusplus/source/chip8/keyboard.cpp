@@ -27,3 +27,8 @@ bool Keyboard::hasBeenReleased(uint8_t key)
 {
     return _lastState[key] && _keypad[key]== false;
 }
+
+bool Keyboard::isKeyPressed(uint8_t key)
+{
+    return _keypad[key];
+}

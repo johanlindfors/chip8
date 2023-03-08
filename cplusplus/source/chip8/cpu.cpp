@@ -82,11 +82,11 @@ int CPU::execute(
     }   
 }
 
-// 0x1000
-int CPU::opJump(uint16_t addr)
+// 0x1NNN
+int CPU::opJump(uint16_t nnn)
 {
-    printf("Jump to %#04x,\n", addr);
-    _pc = addr;
+    printf("Jump to %#04x,\n", nnn);
+    _pc = nnn;
     return 105;
 }
 
@@ -178,7 +178,7 @@ int CPU::opDisplay(uint8_t x, uint8_t y, uint8_t n, std::shared_ptr<Display> dis
 }
 
 // 0xFX0A
-int CPU::opGetKey(uint16_t x, shared_ptr<Keyboard> keyboard)
+int CPU::opGetKey(uint8_t x, shared_ptr<Keyboard> keyboard)
 {
 	for(auto i = 0; i < 16; i++) {
 		if(keyboard->hasBeenReleased(i)) {
@@ -188,4 +188,139 @@ int CPU::opGetKey(uint16_t x, shared_ptr<Keyboard> keyboard)
 	}
 	_pc -= 2;
 	return 1;
+}
+
+// 0xFX29
+int CPU::opFontCharacter(uint8_t x)
+{
+    _index = SPRITE_CHARS_ADDR + _registers->get(x);
+    return 91;
+}
+
+// 0xFX55
+int CPU::opStoreRegistersToMemory(uint8_t x)
+{
+    for (auto i=0; i <= x ; i++) {
+        _memory->set(_index + i, _registers->get(i));
+    }
+    return 605 + x * 64;
+}
+
+// 0xFX65
+int CPU::opLoadRegistersFromMemory(uint8_t x)
+{
+    for(auto i=0; i <= x; i++) {
+        _registers->set(x, _memory->get(_index + i));
+    }
+    return 605 + x * 64;
+}
+
+// 0xFX33
+int CPU::opBinaryCodeDecimalConversion(uint8_t x)
+{
+    _memory->set(_index, _registers->get(x) /100);
+    _memory->set(_index + 1, (_registers->get(x) /10) % 10);
+    _memory->set(_index + 2, _registers->get(x) % 10);
+    return 927;
+}
+
+// 0xFX1E
+int CPU::opAddToIndex(uint8_t x)
+{
+    _index += _registers->get(x);
+    return 86;
+}
+
+// 0xFX07
+int CPU::opGetDelayTimer(uint8_t x)
+{
+    _registers->set(x, _delayTimer);
+    return 45;
+}
+
+// 0xFX15
+int CPU::opSetDelayTimer(uint8_t x)
+{
+    _delayTimer = _registers->get(x);
+    return 45;
+}
+
+// 0xFX18
+int CPU::opSetSoundTimer(uint8_t x)
+{
+    _soundTimer = _registers->get(x);
+    return 45;
+}
+
+// 0x3XNN
+int CPU::opSkipIfVxEqualsNn(uint8_t x, uint8_t nn)
+{
+    auto clockCycles = 55;
+    if(_registers->get(x) == nn) {
+        _pc += 2;
+    } else {
+        clockCycles += 9;
+    }
+    return clockCycles;
+}
+
+// 0x4XNN
+int CPU::opSkipIfVxNotEqualsNn(uint8_t x, uint8_t nn)
+{
+    auto clockCycles = 55;
+    if(_registers->get(x) != nn) {
+        _pc += 2;
+    } else {
+        clockCycles += 9;
+    }
+    return clockCycles;
+}
+
+// 0x9XY0
+int CPU::opSkipIfVxNotEqualsVy(uint8_t x, uint8_t y)
+{
+    auto clockCycles = 73;
+    if(_registers->get(x) != _registers->get(y)) {
+        _pc += 2;
+    } else {
+        clockCycles += 9;
+    }
+    return clockCycles;
+}
+
+// 0x5XY0
+int CPU::opSkipIfVxEqualsVy(uint8_t x, uint8_t y)
+{
+    auto clockCycles = 55;
+    if(_registers->get(x) == _registers->get(y)) {
+        _pc += 2;
+    } else {
+        clockCycles += 9;
+    }
+    return clockCycles;
+}
+
+// 0xEX9E
+int CPU::opSkipIfKeyPressed(uint8_t x, shared_ptr<Keyboard> keyboard)
+{
+    if(keyboard->isKeyPressed(_registers->get(x))) {
+        _pc += 2;
+    }
+    return 73;
+}
+
+// 0xEXA1
+int CPU::opSkipIfNotKeyPressed(uint8_t x, shared_ptr<Keyboard> keyboard)
+{
+    if(!keyboard->isKeyPressed(_registers->get(x))) {
+        _pc += 2;
+    }
+    return 73;
+}
+
+// 0xCXNN
+int CPU::opRandom(uint8_t x, uint8_t nn)
+{
+    // TODO: Implement proper random
+    return 73;
 }

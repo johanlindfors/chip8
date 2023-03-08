@@ -46,7 +46,7 @@ namespace Chip8 {
                 std::shared_ptr<Display> display,
                 std::shared_ptr<Keyboard> keyboard);
 
-            int opJump(uint16_t addr);
+            int opJump(uint16_t nnn);
             int opClearScreen(std::shared_ptr<Display> display);
             int opReturn();
             int opReturnFromSubroutine();
@@ -54,7 +54,22 @@ namespace Chip8 {
             int opAddNnToRegisterVx(uint8_t x, uint8_t nn);
             int opSetIndexRegister(uint16_t nnn);
             int opDisplay(uint8_t x, uint8_t y, uint8_t n, std::shared_ptr<Display> display);
-            int opGetKey(uint16_t x, std::shared_ptr<Keyboard> keyboard);
+            int opGetKey(uint8_t x, std::shared_ptr<Keyboard> keyboard);
+            int opFontCharacter(uint8_t x);
+            int opStoreRegistersToMemory(uint8_t x);
+            int opLoadRegistersFromMemory(uint8_t x);
+            int opBinaryCodeDecimalConversion(uint8_t x);
+            int opAddToIndex(uint8_t x);
+            int opGetDelayTimer(uint8_t x);
+            int opSetDelayTimer(uint8_t x);
+            int opSetSoundTimer(uint8_t x);
+            int opSkipIfVxEqualsNn(uint8_t x, uint8_t nn);
+            int opSkipIfVxNotEqualsNn(uint8_t x, uint8_t nn);
+            int opSkipIfVxNotEqualsVy(uint8_t x, uint8_t y);
+            int opSkipIfVxEqualsVy(uint8_t x, uint8_t y);
+            int opSkipIfKeyPressed(uint8_t x, std::shared_ptr<Keyboard> keyboard);
+            int opSkipIfNotKeyPressed(uint8_t x, std::shared_ptr<Keyboard> keyboard);
+            int opRandom(uint8_t x, uint8_t nn);
 
             int _pc;
             int _index;

@@ -11,6 +11,7 @@ namespace Chip8
         void update();
 
         bool hasBeenReleased(uint8_t key);
+        bool isKeyPressed(uint8_t key);
 
     private:
         bool _keypad[16];
