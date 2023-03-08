@@ -22,3 +22,8 @@ void Keyboard::update()
         _lastState[i] = _keypad[i];
     }   
 }
+
+bool Keyboard::hasBeenReleased(uint8_t key)
+{
+    return _lastState[key] && _keypad[key]== false;
+}

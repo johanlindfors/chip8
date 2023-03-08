@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace Chip8
 {
@@ -8,7 +9,9 @@ namespace Chip8
         Keyboard();
         ~Keyboard();
         void update();
-                
+
+        bool hasBeenReleased(uint8_t key);
+
     private:
         bool _keypad[16];
         bool _lastState[16];

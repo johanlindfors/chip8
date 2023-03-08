@@ -176,3 +176,16 @@ int CPU::opDisplay(uint8_t x, uint8_t y, uint8_t n, std::shared_ptr<Display> dis
 
     return 22734;
 }
+
+// 0xFX0A
+int CPU::opGetKey(uint16_t x, shared_ptr<Keyboard> keyboard)
+{
+	for(auto i = 0; i < 16; i++) {
+		if(keyboard->hasBeenReleased(i)) {
+			_registers->set(x, i);
+			return 1;
+		}
+	}
+	_pc -= 2;
+	return 1;
+}

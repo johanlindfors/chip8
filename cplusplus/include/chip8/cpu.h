@@ -54,6 +54,7 @@ namespace Chip8 {
             int opAddNnToRegisterVx(uint8_t x, uint8_t nn);
             int opSetIndexRegister(uint16_t nnn);
             int opDisplay(uint8_t x, uint8_t y, uint8_t n, std::shared_ptr<Display> display);
+            int opGetKey(uint16_t x, std::shared_ptr<Keyboard> keyboard);
 
             int _pc;
             int _index;
