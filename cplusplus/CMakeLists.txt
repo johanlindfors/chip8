@@ -5,17 +5,13 @@ include_directories(
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-file(GLOB SOURCES 
+file(GLOB_RECURSE SOURCES 
     "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/source/chip8/*.cpp"
 )
 
-file(GLOB HEADERS
+file(GLOB_RECURSE HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
-
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME} SDL2)
