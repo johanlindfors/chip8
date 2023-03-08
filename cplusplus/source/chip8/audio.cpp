@@ -9,3 +9,18 @@ Audio::Audio()
 Audio::~Audio()
 {
 }
+
+void Audio::play()
+{
+
+}
+
+void Audio::pause()
+{
+
+}
+
+bool Audio::isPlaying()
+{
+    return false;
+}

@@ -7,8 +7,10 @@ namespace Chip8
     public:
         Keyboard();
         ~Keyboard();
-        
+        void update();
+                
     private:
         bool _keypad[16];
+        bool _lastState[16];
     };   
 }

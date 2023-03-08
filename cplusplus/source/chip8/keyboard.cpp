@@ -12,4 +12,13 @@ Keyboard::Keyboard()
 
 Keyboard::~Keyboard()
 {
+    
+}
+
+void Keyboard::update()
+{
+    for (int i = 0; i < 16; i++)
+    {
+        _lastState[i] = _keypad[i];
+    }   
 }

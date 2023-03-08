@@ -9,5 +9,9 @@ namespace Chip8
     public:
         Audio();
         ~Audio();
+
+        void play();
+        void pause();
+        bool isPlaying();
     };
 } // namespace Chip8

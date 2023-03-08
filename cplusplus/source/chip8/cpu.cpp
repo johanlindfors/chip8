@@ -17,9 +17,14 @@ void CPU::tick(
         _delayTimer--;
     }
     if(_soundTimer > 0) {
-        _soundTimer--;
+        if(!audio->isPlaying()) {
+            audio->play();
+        }
+        _soundTimer--;        
     } else {
-
+        if(audio != nullptr && audio->isPlaying()) {
+            audio->pause();
+        }
     }
 
     _microSeconds += 16666;
@@ -77,6 +82,7 @@ int CPU::execute(
     }   
 }
 
+// 0x1000
 int CPU::opJump(uint16_t addr)
 {
     printf("Jump to %#04x,\n", addr);
@@ -84,6 +90,7 @@ int CPU::opJump(uint16_t addr)
     return 105;
 }
 
+// 0x00E0
 int CPU::opClearScreen(shared_ptr<Display> display)
 {
     printf("ClearScreen,\n");
@@ -91,6 +98,7 @@ int CPU::opClearScreen(shared_ptr<Display> display)
     return 109;
 }
 
+// 0x000E
 int CPU::opReturn()
 {
     printf("Return,\n");
@@ -98,6 +106,7 @@ int CPU::opReturn()
     return 1;
 }
 
+// 0x00EE
 int CPU::opReturnFromSubroutine()
 {
     printf("Return from subroutine,\n");
@@ -108,6 +117,7 @@ int CPU::opReturnFromSubroutine()
     return 0;
 }
 
+// 0x6XNN
 int CPU::opSetRegisterVxToNn(uint8_t x, uint8_t nn)
 {
     printf("Setting register %d to value: %d,\n", x, nn);
@@ -115,6 +125,7 @@ int CPU::opSetRegisterVxToNn(uint8_t x, uint8_t nn)
     return 27;
 }
 
+// 0x7XNN
 int CPU::opAddNnToRegisterVx(uint8_t x, uint8_t nn)
 {
     auto vx = _registers->get(x);
@@ -128,12 +139,14 @@ int CPU::opAddNnToRegisterVx(uint8_t x, uint8_t nn)
     return 45;
 }
 
+// 0xANNN
 int CPU::opSetIndexRegister(uint16_t nnn)
 {
     _index = nnn;
     return 55;
 }
 
+// 0xDXYN
 int CPU::opDisplay(uint8_t x, uint8_t y, uint8_t n, std::shared_ptr<Display> display)
 {
     auto index = _index;

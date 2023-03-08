@@ -1,5 +1,6 @@
 #include "chip8/memory.h"
 #include <fstream>
+#include <sstream>
 
 using namespace Chip8;
 
@@ -26,7 +27,7 @@ uint8_t SPRITE_CHARS[80] =
 
 Memory::Memory() {
     for (int i = 0; i < 4096; i++) {
-        _ram[i] = 0;
+        _ram[i] = 0x00;
     }
     load(0x0000, SPRITE_CHARS, 80);
 }
@@ -47,28 +48,22 @@ void Memory::load(int addr, uint8_t* data, int length) {
 
 void Memory::loadROM(char const* filename)
 {
-	// Open the file as a stream of binary and move the file pointer to the end
 	std::ifstream file(filename, std::ios::binary | std::ios::ate);
-
 	if (file.is_open())
 	{
-		// Get size of file and allocate a buffer to hold the contents
 		std::streampos size = file.tellg();
 		char* buffer = new char[size];
 
-		// Go back to the beginning of the file and fill the buffer
 		file.seekg(0, std::ios::beg);
 		file.read(buffer, size);
 		file.close();
 
-		// Load the ROM contents into the Chip8's memory, starting at 0x200
 		for (long i = 0; i < size; ++i)
 		{
 			_ram[PROGRAM_START_ADDRESS + i] = buffer[i];
 		}
 
         printf("ROM Loaded...\n");
-		// Free the buffer
 		delete[] buffer;
 	}
 }
