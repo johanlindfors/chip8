@@ -2,3 +2,4 @@
 **/obj/*
 **/zig-cache/*
 **/zig-out/*
+**/build/*
