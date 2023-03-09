@@ -46,7 +46,7 @@ void Emulator::run()
         auto currentTime = std::chrono::high_resolution_clock::now();
         
         while( SDL_PollEvent( &e ) ) {
-            printf( "SDL event! %d\n", e.type);
+            // printf( "SDL event! %d\n", e.type);
             switch (e.type) {
                 case SDL_QUIT:
                     quit = true;

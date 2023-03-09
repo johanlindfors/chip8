@@ -61,9 +61,9 @@ void Memory::loadROM(char const* filename)
 		for (long i = 0; i < size; ++i)
 		{
 			_ram[PROGRAM_START_ADDRESS + i] = buffer[i];
-            printf("%02x\n", static_cast<uint8_t>(buffer[i]));
+            // printf("%02x\n", static_cast<uint8_t>(buffer[i]));
 		}
-        _ram[0x1ff] = 5;
+        _ram[0x1ff] = 3;
         printf("ROM Loaded...\n");
 		delete[] buffer;
 	}

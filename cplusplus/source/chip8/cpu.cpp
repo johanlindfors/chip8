@@ -248,7 +248,7 @@ int CPU::opStoreRegistersToMemory(uint8_t x)
 int CPU::opLoadRegistersFromMemory(uint8_t x)
 {
     for(auto i=0; i <= x; i++) {
-        _registers->set(x, _memory->get(_index + i));
+        _registers->set(i, _memory->get(_index + i));
     }
     return 605 + x * 64;
 }
@@ -369,34 +369,36 @@ int CPU::opRandom(uint8_t x, uint8_t nn)
     return 73;
 }
 
-// 0xBXNN
-int CPU::opJumpWithOffset(uint16_t nn)
+// 0xBNNN
+int CPU::opJumpWithOffset(uint16_t nnn)
 {
-    _pc = nn + _registers->get(0);
+    _pc = nnn + _registers->get(0);
     return 105;
 }
 
 // 0x8XY0
 int CPU::opSetVxToValueOfVy(uint8_t x, uint8_t y)
 {
-    _registers->set(x, _registers->get(x));
+    _registers->set(x, _registers->get(y));
     return 200;
 }
 
 // 0x8XY6
 int CPU::opShiftRight(uint8_t x)
 {
-    auto flag = _registers->get(x) & 0x1;
-    _registers->set(x, _registers->get(x) >> 1);
+    auto vx = _registers->get(x);
+    auto flag = vx & 0x1;
+    _registers->set(x, vx >> 1);
     _registers->set(0xF, flag);
     return 200;
 }
 
-// 0x8XY6
+// 0x8XYE
 int CPU::opShiftLeft(uint8_t x)
 {
-    auto flag = (_registers->get(x) & 0x80) >> 7;
-    _registers->set(x, _registers->get(x) << 1);
+    auto vx = _registers->get(x);
+    auto flag = (vx & 0x80) >> 7;
+    _registers->set(x, vx << 1);
     _registers->set(0xF, flag);
     return 200;
 }
