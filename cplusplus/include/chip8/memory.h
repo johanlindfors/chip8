@@ -16,12 +16,12 @@ namespace Chip8 {
     class Memory {
         public:
             Memory();
-            void set(int addr, char value);
-            char get(int addr);
+            void set(uint16_t addr, uint8_t value);
+            uint8_t get(uint16_t addr);
             void load(int addr, uint8_t* data, int length);
             void loadROM(char const* filename);
 
         private:
-            char _ram[4096]; 
+            uint8_t _ram[4096]; 
     };
 }

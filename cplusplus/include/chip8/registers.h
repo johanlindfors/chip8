@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace Chip8
 {
@@ -10,8 +11,8 @@ namespace Chip8
     public:    
         Registers();
         ~Registers();
-        void set(int index, char value);
-        char get(int index);
+        void set(uint8_t index, uint8_t value);
+        uint8_t get(uint8_t index);
     };
     
 } // namespace Chip8

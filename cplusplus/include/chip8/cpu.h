@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include <random>
+#include <chrono>
 #include "chip8/memory.h"
 
 namespace Chip8 {
@@ -21,6 +23,7 @@ namespace Chip8 {
                 , _microSeconds(0)
                 , _memory(memory)
                 , _registers(registers)
+                , randGen(std::chrono::system_clock::now().time_since_epoch().count())
             { 
                 for (int i = 0; i < 16; i++)
                 {
@@ -82,14 +85,17 @@ namespace Chip8 {
             int opBinaryAnd(uint8_t x, uint8_t y);
             int opJumpToSubroutine(uint16_t nnn);
 
-            int _pc;
-            int _index;
-            int _sp;
-            int _stack[16];
-            int _delayTimer;
-            int _soundTimer;
-            int _microSeconds;
+            uint16_t _pc;
+            uint16_t _index;
+            uint8_t _sp;
+            uint16_t _stack[16];
+            uint8_t _delayTimer;
+            uint8_t _soundTimer;
+            uint8_t _microSeconds;
             std::shared_ptr<Memory> _memory;
             std::shared_ptr<Registers> _registers;
+
+            std::default_random_engine randGen;
+            std::uniform_int_distribution<uint8_t> randByte;
     };
 }

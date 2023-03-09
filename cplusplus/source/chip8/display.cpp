@@ -4,18 +4,13 @@ using namespace Chip8;
 
 void Display::init()
 {    
-    //Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    //Create window
+    SDL_CreateWindowAndRenderer(640, 320, SDL_WINDOW_SHOWN, &_window, &_renderer);
+    if( _window == NULL || _renderer == NULL)
     {
-        printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
-    } else {
-        //Create window
-        SDL_CreateWindowAndRenderer(640, 320, SDL_WINDOW_SHOWN, &_window, &_renderer);
-        if( _window == NULL || _renderer == NULL)
-        {
-            printf( "Window or renderer could not be created! SDL_Error: %s\n", SDL_GetError() );
-        }
+        printf( "Window or renderer could not be created! SDL_Error: %s\n", SDL_GetError() );
     }
+
 }
 
 void Display::flipPixel(int index)

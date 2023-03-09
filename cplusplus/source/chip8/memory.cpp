@@ -32,11 +32,11 @@ Memory::Memory() {
     load(0x0000, SPRITE_CHARS, 80);
 }
 
-void Memory::set(int addr, char value) {
+void Memory::set(uint16_t addr, uint8_t value) {
     _ram[addr] = value;
 }
 
-char Memory::get(int addr) {
+uint8_t Memory::get(uint16_t addr) {
     return _ram[addr];
 }
 
@@ -61,8 +61,9 @@ void Memory::loadROM(char const* filename)
 		for (long i = 0; i < size; ++i)
 		{
 			_ram[PROGRAM_START_ADDRESS + i] = buffer[i];
+            printf("%02x\n", static_cast<uint8_t>(buffer[i]));
 		}
-
+        _ram[0x1ff] = 5;
         printf("ROM Loaded...\n");
 		delete[] buffer;
 	}

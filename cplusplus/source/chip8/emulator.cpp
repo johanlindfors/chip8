@@ -6,6 +6,7 @@
 #include "chip8/display.h"
 #include "chip8/keyboard.h"
 #include "chip8/audio.h"
+#include <chrono>
 
 using namespace std;
 using namespace Chip8;
@@ -30,18 +31,37 @@ Emulator::~Emulator()
 
 void Emulator::run()
 {
+    if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
+    {
+        printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+    }
+    
     _display->init();
 
     SDL_Event e; 
     bool quit = false; 
+    auto lastCycleTime = std::chrono::high_resolution_clock::now();
     while( quit == false ) {
+        _keyboard->update();
+        auto currentTime = std::chrono::high_resolution_clock::now();
         
-        _cpu->tick(_display, _keyboard, _audio);
-        
-        while( SDL_PollEvent( &e ) ) { 
-            if( e.type == SDL_QUIT ) 
-                quit = true;
+        while( SDL_PollEvent( &e ) ) {
+            printf( "SDL event! %d\n", e.type);
+            switch (e.type) {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_KEYDOWN:
+                    _keyboard->handleKeyDown(e.key.keysym.sym);
+                    break;
+                case SDL_KEYUP:
+                    _keyboard->handleKeyUp(e.key.keysym.sym);
+                    break;
+                default:
+                    break;
+            }
         }
+        _cpu->tick(_display, _keyboard, _audio);
         if(_display->getDrawFlag()){
             _display->draw();
         }

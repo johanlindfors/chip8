@@ -14,12 +14,12 @@ Registers::~Registers()
 {
 }
 
-void Registers::set(int index, char value) 
+void Registers::set(uint8_t index, uint8_t value) 
 {
     _registers[index] = value;
 }
 
-char Registers::get(int index) 
+uint8_t Registers::get(uint8_t index) 
 {
     return _registers[index];
 }
