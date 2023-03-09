@@ -324,3 +324,104 @@ int CPU::opRandom(uint8_t x, uint8_t nn)
     // TODO: Implement proper random
     return 73;
 }
+
+// 0xBXNN
+int CPU::opJumpWithOffset(uint16_t nn)
+{
+    _pc = nn + _registers->get(0);
+    return 105;
+}
+
+// 0x8XY0
+int CPU::opSetVxToValueOfVy(uint8_t x, uint8_t y)
+{
+    _registers->set(x, _registers->get(x));
+    return 200;
+}
+
+// 0x8XY6
+int CPU::opShiftRight(uint8_t x)
+{
+    auto flag = _registers->get(x) & 0x1;
+    _registers->set(x, _registers->get(x) >> 1);
+    _registers->set(0xF, flag);
+    return 200;
+}
+
+// 0x8XY6
+int CPU::opShiftLeft(uint8_t x)
+{
+    auto flag = (_registers->get(x) & 0x80) >> 7;
+    _registers->set(x, _registers->get(x) << 11);
+    _registers->set(0xF, flag);
+    return 200;
+}
+
+// 0x8XY5
+int CPU::opSubtractVyFromVx(uint8_t x, uint8_t y)
+{
+    auto vx = _registers->get(x);
+    auto vy = _registers->get(y);
+    auto borrow = vx > vy ? 1 : 0;
+    _registers->set(x, (vx - vy) & 0xFF);
+    _registers->set(0xF, borrow);
+    return 200;
+}
+
+// 0x8XY7
+int CPU::opSubtractVxFromVy(uint8_t x, uint8_t y)
+{
+    auto vx = _registers->get(x);
+    auto vy = _registers->get(y);
+    auto flag = vy > vx ? 1 : 0;
+    _registers->set(x, (vy - vx) & 0xFF);
+    _registers->set(0xF, flag);
+    return 200;
+}
+
+// 0x8XY4
+int CPU::opAddWithCarry(uint8_t x, uint8_t y)
+{
+    auto sum = _registers->get(x) + _registers->get(y);
+    _registers->set(0xF, sum > 255 ? 1 : 0);
+    _registers->set(x, sum & 0xFF);
+    return 200;
+}
+
+// 0x8XY1
+int CPU::opBinaryOr(uint8_t x, uint8_t y)
+{
+    auto vx = _registers->get(x);
+    auto vy = _registers->get(y);
+    _registers->set(x, vx |= vy);
+    return 200;
+}
+
+// 0x8XY3
+int CPU::opBinaryXor(uint8_t x, uint8_t y)
+{
+    auto vx = _registers->get(x);
+    auto vy = _registers->get(y);
+    _registers->set(x, vx ^= vy);
+    return 200;
+}
+
+// 0x8XY2
+int CPU::opBinaryAnd(uint8_t x, uint8_t y)
+{
+    auto vx = _registers->get(x);
+    auto vy = _registers->get(y);
+    _registers->set(x, vx &= vy);
+    return 200;
+}
+
+// 0x2NNN
+int CPU::opJumpToSubroutine(uint16_t nnn)
+{
+    if(_sp < 16) {
+        _stack[_sp] = _pc;
+        _sp++;
+        _pc = nnn;
+    }
+    return 105;
+}

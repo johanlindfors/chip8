@@ -70,6 +70,17 @@ namespace Chip8 {
             int opSkipIfKeyPressed(uint8_t x, std::shared_ptr<Keyboard> keyboard);
             int opSkipIfNotKeyPressed(uint8_t x, std::shared_ptr<Keyboard> keyboard);
             int opRandom(uint8_t x, uint8_t nn);
+            int opJumpWithOffset(uint16_t nn);
+            int opSetVxToValueOfVy(uint8_t x, uint8_t y);
+            int opShiftRight(uint8_t x);
+            int opShiftLeft(uint8_t x);
+            int opSubtractVyFromVx(uint8_t x, uint8_t y);
+            int opSubtractVxFromVy(uint8_t x, uint8_t y);
+            int opAddWithCarry(uint8_t x, uint8_t y);
+            int opBinaryOr(uint8_t x, uint8_t y);
+            int opBinaryXor(uint8_t x, uint8_t y);
+            int opBinaryAnd(uint8_t x, uint8_t y);
+            int opJumpToSubroutine(uint16_t nnn);
 
             int _pc;
             int _index;
