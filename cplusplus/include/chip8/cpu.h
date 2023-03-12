@@ -91,7 +91,7 @@ namespace Chip8 {
             uint16_t _stack[16];
             uint8_t _delayTimer;
             uint8_t _soundTimer;
-            uint8_t _microSeconds;
+            int _microSeconds;
             std::shared_ptr<Memory> _memory;
             std::shared_ptr<Registers> _registers;
 

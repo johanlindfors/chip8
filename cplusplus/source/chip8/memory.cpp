@@ -63,7 +63,7 @@ void Memory::loadROM(char const* filename)
 			_ram[PROGRAM_START_ADDRESS + i] = buffer[i];
             // printf("%02x\n", static_cast<uint8_t>(buffer[i]));
 		}
-        _ram[0x1ff] = 3;
+        // _ram[0x1ff] = 4;
         printf("ROM Loaded...\n");
 		delete[] buffer;
 	}

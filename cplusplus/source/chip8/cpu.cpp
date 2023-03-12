@@ -13,6 +13,7 @@ void CPU::tick(
     shared_ptr<Keyboard> keyboard, 
     shared_ptr<Audio> audio)
 {
+    printf("CPU TICK!\n");
     if(_delayTimer > 0) {
         _delayTimer--;
     }
@@ -27,7 +28,9 @@ void CPU::tick(
         }
     }
 
-    _microSeconds += 16666;
+    while(_microSeconds <= 0) {
+        _microSeconds += 16666;
+    }
     while(_microSeconds > 0) {
         auto delta = emulateCycle(display, keyboard);
         if(delta == 0) {
@@ -48,7 +51,9 @@ int CPU::emulateCycle(
 
 uint16_t CPU::getOpcode()
 {
-    return _memory->get(_pc++) << 8 | _memory->get(_pc++);
+    auto opcode = _memory->get(_pc) << 8 | _memory->get(_pc + 1);
+    _pc += 2;
+    return opcode;
 }
 
 int CPU::execute(
@@ -63,7 +68,7 @@ int CPU::execute(
     uint8_t nn = opcode & 0x00FF;
     uint16_t nnn = opcode & 0x0FFF;
 
-   //printf("OPCODE: %04X\n", opcode);
+    printf("OPCODE: %04X\n", opcode);
     
     switch (opcode & 0xF000)
     {
@@ -130,7 +135,7 @@ int CPU::opJump(uint16_t nnn)
 // 0x00E0
 int CPU::opClearScreen(shared_ptr<Display> display)
 {
-    printf("ClearScreen,\n");
+    printf("ClearScreen\n");
     display->clear();
     return 109;
 }
@@ -165,6 +170,7 @@ int CPU::opSetRegisterVxToNn(uint8_t x, uint8_t nn)
 // 0x7XNN
 int CPU::opAddNnToRegisterVx(uint8_t x, uint8_t nn)
 {
+    printf("opAddNnToRegsiterVx\n");
     auto vx = _registers->get(x);
     auto vy = nn;
     while(vy != 0) {
@@ -218,7 +224,8 @@ int CPU::opDisplay(uint8_t x, uint8_t y, uint8_t n, std::shared_ptr<Display> dis
 // 0xFX0A
 int CPU::opGetKey(uint8_t x, shared_ptr<Keyboard> keyboard)
 {
-	for(auto i = 0; i < 16; i++) {
+	printf("opGetKey\n");
+    for(auto i = 0; i < 16; i++) {
 		if(keyboard->hasBeenReleased(i)) {
 			_registers->set(x, i);
 			return 1;
@@ -231,6 +238,7 @@ int CPU::opGetKey(uint8_t x, shared_ptr<Keyboard> keyboard)
 // 0xFX29
 int CPU::opFontCharacter(uint8_t x)
 {
+    printf("opFontCharacter\n");
     _index = SPRITE_CHARS_ADDR + _registers->get(x);
     return 91;
 }
@@ -238,6 +246,7 @@ int CPU::opFontCharacter(uint8_t x)
 // 0xFX55
 int CPU::opStoreRegistersToMemory(uint8_t x)
 {
+    printf("opStoreRegistersToMemory\n");
     for (auto i=0; i <= x ; i++) {
         _memory->set(_index + i, _registers->get(i));
     }
@@ -247,6 +256,7 @@ int CPU::opStoreRegistersToMemory(uint8_t x)
 // 0xFX65
 int CPU::opLoadRegistersFromMemory(uint8_t x)
 {
+    printf("opLoadRegistersFromMemory\n");
     for(auto i=0; i <= x; i++) {
         _registers->set(i, _memory->get(_index + i));
     }
@@ -256,6 +266,7 @@ int CPU::opLoadRegistersFromMemory(uint8_t x)
 // 0xFX33
 int CPU::opBinaryCodeDecimalConversion(uint8_t x)
 {
+    printf("opBinaryCodeDecimalConversion\n");
     auto vx = _registers->get(x);
     printf("%d\n", vx);
     _memory->set(_index, vx / 100);
@@ -271,6 +282,7 @@ int CPU::opBinaryCodeDecimalConversion(uint8_t x)
 // 0xFX1E
 int CPU::opAddToIndex(uint8_t x)
 {
+    printf("opAddToIndex\n");
     _index += _registers->get(x);
     return 86;
 }
@@ -278,6 +290,7 @@ int CPU::opAddToIndex(uint8_t x)
 // 0xFX07
 int CPU::opGetDelayTimer(uint8_t x)
 {
+    printf("opGetDelayTimer\n");
     _registers->set(x, _delayTimer);
     return 45;
 }
@@ -285,6 +298,7 @@ int CPU::opGetDelayTimer(uint8_t x)
 // 0xFX15
 int CPU::opSetDelayTimer(uint8_t x)
 {
+    printf("opSetDelayTimer\n");
     _delayTimer = _registers->get(x);
     return 45;
 }
@@ -292,6 +306,7 @@ int CPU::opSetDelayTimer(uint8_t x)
 // 0xFX18
 int CPU::opSetSoundTimer(uint8_t x)
 {
+    printf("opSetSoundTimer\n");
     _soundTimer = _registers->get(x);
     return 45;
 }
@@ -299,6 +314,7 @@ int CPU::opSetSoundTimer(uint8_t x)
 // 0x3XNN
 int CPU::opSkipIfVxEqualsNn(uint8_t x, uint8_t nn)
 {
+    printf("opSkipIfVxEquals\n");
     auto clockCycles = 55;
     if(_registers->get(x) == nn) {
         _pc += 2;
@@ -311,6 +327,7 @@ int CPU::opSkipIfVxEqualsNn(uint8_t x, uint8_t nn)
 // 0x4XNN
 int CPU::opSkipIfVxNotEqualsNn(uint8_t x, uint8_t nn)
 {
+    printf("opSkipIfVxNotEquals\n");
     auto clockCycles = 55;
     if(_registers->get(x) != nn) {
         _pc += 2;
@@ -323,6 +340,7 @@ int CPU::opSkipIfVxNotEqualsNn(uint8_t x, uint8_t nn)
 // 0x9XY0
 int CPU::opSkipIfVxNotEqualsVy(uint8_t x, uint8_t y)
 {
+    printf("opSkipIfVxNotEqualsVy\n");
     auto clockCycles = 73;
     if(_registers->get(x) != _registers->get(y)) {
         _pc += 2;
@@ -335,6 +353,7 @@ int CPU::opSkipIfVxNotEqualsVy(uint8_t x, uint8_t y)
 // 0x5XY0
 int CPU::opSkipIfVxEqualsVy(uint8_t x, uint8_t y)
 {
+    printf("opSkipIfVxEqualsVy\n");
     auto clockCycles = 55;
     if(_registers->get(x) == _registers->get(y)) {
         _pc += 2;
@@ -347,6 +366,7 @@ int CPU::opSkipIfVxEqualsVy(uint8_t x, uint8_t y)
 // 0xEX9E
 int CPU::opSkipIfKeyPressed(uint8_t x, shared_ptr<Keyboard> keyboard)
 {
+    printf("opSkipIfKeyPressed\n");
     if(keyboard->isKeyPressed(_registers->get(x))) {
         _pc += 2;
     }
@@ -356,6 +376,7 @@ int CPU::opSkipIfKeyPressed(uint8_t x, shared_ptr<Keyboard> keyboard)
 // 0xEXA1
 int CPU::opSkipIfNotKeyPressed(uint8_t x, shared_ptr<Keyboard> keyboard)
 {
+    printf("opSkipIfNotKeyPressed\n");
     if(!keyboard->isKeyPressed(_registers->get(x))) {
         _pc += 2;
     }
@@ -365,6 +386,7 @@ int CPU::opSkipIfNotKeyPressed(uint8_t x, shared_ptr<Keyboard> keyboard)
 // 0xCXNN
 int CPU::opRandom(uint8_t x, uint8_t nn)
 {
+    printf("opRandom\n");
     _registers->set(x, randByte(randGen) & nn);
     return 73;
 }
@@ -372,6 +394,7 @@ int CPU::opRandom(uint8_t x, uint8_t nn)
 // 0xBNNN
 int CPU::opJumpWithOffset(uint16_t nnn)
 {
+    printf("opJumpWithOffset\n");
     _pc = nnn + _registers->get(0);
     return 105;
 }
@@ -379,6 +402,7 @@ int CPU::opJumpWithOffset(uint16_t nnn)
 // 0x8XY0
 int CPU::opSetVxToValueOfVy(uint8_t x, uint8_t y)
 {
+    printf("opSetVxToValueOfVy\n");
     _registers->set(x, _registers->get(y));
     return 200;
 }
@@ -386,6 +410,7 @@ int CPU::opSetVxToValueOfVy(uint8_t x, uint8_t y)
 // 0x8XY6
 int CPU::opShiftRight(uint8_t x)
 {
+    printf("opShiftRight\n");
     auto vx = _registers->get(x);
     auto flag = vx & 0x1;
     _registers->set(x, vx >> 1);
@@ -396,6 +421,7 @@ int CPU::opShiftRight(uint8_t x)
 // 0x8XYE
 int CPU::opShiftLeft(uint8_t x)
 {
+    printf("opShiftLeft\n");
     auto vx = _registers->get(x);
     auto flag = (vx & 0x80) >> 7;
     _registers->set(x, vx << 1);
@@ -406,6 +432,7 @@ int CPU::opShiftLeft(uint8_t x)
 // 0x8XY5
 int CPU::opSubtractVyFromVx(uint8_t x, uint8_t y)
 {
+    printf("opSubtractVyFromVx\n");
     uint8_t vx = _registers->get(x);
     uint8_t vy = _registers->get(y);
     auto borrow = vx > vy ? 1 : 0;
@@ -417,6 +444,7 @@ int CPU::opSubtractVyFromVx(uint8_t x, uint8_t y)
 // 0x8XY7
 int CPU::opSubtractVxFromVy(uint8_t x, uint8_t y)
 {
+    printf("opSubtractVxFromVy\n");
     auto vx = _registers->get(x);
     auto vy = _registers->get(y);
     auto flag = vy > vx ? 1 : 0;
@@ -428,6 +456,7 @@ int CPU::opSubtractVxFromVy(uint8_t x, uint8_t y)
 // 0x8XY4
 int CPU::opAddWithCarry(uint8_t x, uint8_t y)
 {
+    printf("opAddWithCarry\n");
     auto sum = _registers->get(x) + _registers->get(y);
     _registers->set(0xF, sum > 255 ? 1 : 0);
     _registers->set(x, sum & 0xFF);
@@ -437,6 +466,7 @@ int CPU::opAddWithCarry(uint8_t x, uint8_t y)
 // 0x8XY1
 int CPU::opBinaryOr(uint8_t x, uint8_t y)
 {
+    printf("opBinaryOr\n");
     auto vx = _registers->get(x);
     auto vy = _registers->get(y);
     _registers->set(x, vx | vy);
@@ -446,6 +476,7 @@ int CPU::opBinaryOr(uint8_t x, uint8_t y)
 // 0x8XY3
 int CPU::opBinaryXor(uint8_t x, uint8_t y)
 {
+    printf("opBinaryXor\n");
     auto vx = _registers->get(x);
     auto vy = _registers->get(y);
     _registers->set(x, vx ^ vy);
@@ -455,6 +486,7 @@ int CPU::opBinaryXor(uint8_t x, uint8_t y)
 // 0x8XY2
 int CPU::opBinaryAnd(uint8_t x, uint8_t y)
 {
+    printf("opBinaryAnd\n");
     auto vx = _registers->get(x);
     auto vy = _registers->get(y);
     _registers->set(x, vx & vy);
@@ -464,6 +496,7 @@ int CPU::opBinaryAnd(uint8_t x, uint8_t y)
 // 0x2NNN
 int CPU::opJumpToSubroutine(uint16_t nnn)
 {
+    printf("opJumpToSubroutine\n");
     if(_sp < 16) {
         _stack[_sp] = _pc;
         _sp++;

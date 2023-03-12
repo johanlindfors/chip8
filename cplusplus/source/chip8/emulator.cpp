@@ -42,6 +42,7 @@ void Emulator::run()
     bool quit = false; 
     auto lastCycleTime = std::chrono::high_resolution_clock::now();
     while( quit == false ) {
+        printf("Updating keyboard!\n");
         _keyboard->update();
         auto currentTime = std::chrono::high_resolution_clock::now();
         
@@ -52,6 +53,9 @@ void Emulator::run()
                     quit = true;
                     break;
                 case SDL_KEYDOWN:
+                    if (e.key.keysym.sym == SDLK_ESCAPE){
+                        quit = true;
+                    }
                     _keyboard->handleKeyDown(e.key.keysym.sym);
                     break;
                 case SDL_KEYUP:

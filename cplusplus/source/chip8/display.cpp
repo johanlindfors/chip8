@@ -44,7 +44,7 @@ void Display::draw()
     for (int y = 0; y < 32; y++) {
         for(int x = 0; x < 64; x++) {
             if(_frameBuffer[y * 64 + x]) {
-                SDL_Rect rect = { x: x*10, y: y*10, w: 10, h: 10};
+                SDL_Rect rect = { x*10, y*10, 10, 10};
                 SDL_RenderFillRect(_renderer, &rect);
             }
         }
