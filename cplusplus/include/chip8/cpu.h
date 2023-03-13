@@ -28,8 +28,7 @@ namespace Chip8 {
                 for (int i = 0; i < 16; i++)
                 {
                     _stack[i] = 0;
-                }
-                
+                } 
             }
 
             void tick(
@@ -37,11 +36,13 @@ namespace Chip8 {
                 std::shared_ptr<Keyboard> keyboard,
                 std::shared_ptr<Audio> audio);
 
-        private:
             int emulateCycle(
                 std::shared_ptr<Display> display,
-                std::shared_ptr<Keyboard> Keyboard);
+                std::shared_ptr<Keyboard> keyboard);
 
+            int getPc() { return _pc; }
+
+        private:
             uint16_t getOpcode();
 
             int execute(
