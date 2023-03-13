@@ -1,10 +1,13 @@
 function(add_tests)
     foreach(test IN LISTS ARGN)
         set(TEST_NAME "${PROJECT_NAME}_${test}")
-        message(STATUS "Adding ${TEST_NAME}")
         # testing binary
+        include_directories(
+            "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        )
+
         add_executable(${TEST_NAME}
-            "${CMAKE_CURRENT_SOURCE_DIR}/${test}.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/source/${test}.cpp"
         )
         target_link_libraries(${TEST_NAME} PRIVATE ${PROJECT_NAME}_lib SDL2)
 
