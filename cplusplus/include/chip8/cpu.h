@@ -40,7 +40,11 @@ namespace Chip8 {
                 std::shared_ptr<Display> display,
                 std::shared_ptr<Keyboard> keyboard);
 
-            int getPc() { return _pc; }
+            uint16_t getPc() { return _pc; }
+            uint16_t getIndex() { return _index; }
+            void setDelayTimer(uint8_t value) { _delayTimer = value; }
+            uint8_t getDelayTimer() { return _delayTimer; }
+            uint8_t getSoundTimer() { return _soundTimer; }
 
         private:
             uint16_t getOpcode();
