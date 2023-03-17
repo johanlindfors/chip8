@@ -443,3 +443,21 @@ pub const CPU = struct {
         return 105;
     }
 };
+
+
+test "should test opcode 0x1000" {
+    // arrange
+    var cpu = CPU.init();
+    var display = Display.init();
+    var keyboard = Keyboard.init();
+    var data: [4]u8 = [_]u8 {
+        0x12, 0x02, 0x60, 0x01
+    };
+
+    // act
+    cpu.memory.loadProgram(0x200, &data, 4);
+    
+    // assert
+    _ = cpu.emulateCycle(&display, &keyboard);
+    try std.testing.expect(cpu.registers[0] == 0x1);
+}
