@@ -11,7 +11,8 @@ public class Screen : DrawableGameComponent, Chip8.IScreen
     private Rectangle tracedSize;
     private SpriteBatch spriteBatch;
     RenderTarget2D target;
-    
+    System.Random random = new System.Random();
+   
     public Screen(Game game, int width, int height, int scale) : base(game) {
         this.width = width;
         this.height = height;

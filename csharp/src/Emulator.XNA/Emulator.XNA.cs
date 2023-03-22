@@ -13,6 +13,7 @@ public class Emulator : Game
     private GraphicsDeviceManager graphics;
  
     private Chip8.CPU cpu;
+    private Screen screen;
     private readonly Chip8.IKeyboard keyboard;
     private readonly Chip8.Memory memory;
     private Input.KeyboardState oldState;
@@ -38,12 +39,12 @@ public class Emulator : Game
 
     protected override void Initialize()
     {
-        var screen = new Screen(this, WIDTH, HEIGHT, SCALE);
+        screen = new Screen(this, WIDTH, HEIGHT, SCALE);
         this.Components.Add(screen);
         
         var random = new System.Random();
-        var register = new Chip8.Register();
-        this.cpu = new Chip8.CPU(memory, register, random, keyboard, screen);
+        var registers = new Chip8.Registers();
+        this.cpu = new Chip8.CPU(memory, registers, random, keyboard, screen);
 
         GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap; 
         base.Initialize();
@@ -67,16 +68,25 @@ public class Emulator : Game
 
     private void HandleInput() {
         var state = Input.Keyboard.GetState();
-        foreach(var key in oldState.GetPressedKeys()) {
-            TestKey(key, oldState, state);
+        if(state.GetPressedKeyCount() > 0) {
+            foreach(var key in state.GetPressedKeys()) {
+                TestKey(key, oldState, state);
+            }
+        } else if(state != oldState) {
+            foreach(var key in oldState.GetPressedKeys()) {
+                TestKey(key, oldState, state);
+            }
         }
         oldState = state;
     }
 
     private void TestKey(Input.Keys key, Input.KeyboardState oldState, Input.KeyboardState newState) {
-        if(newState.IsKeyDown(key)) {
+        if(newState.IsKeyDown(key) && oldState.IsKeyUp(key)) {
+            System.Console.WriteLine("A key was pressed!");
             keyboard.OnKeyPressed((int)key);
-        } else if(oldState.IsKeyDown(key) && newState.IsKeyUp(key)) {
+        } 
+        if(oldState.IsKeyDown(key) && newState.IsKeyUp(key)) {
+            System.Console.WriteLine("A key was released!");
             keyboard.OnKeyReleased((int)key);
         }        
     }
@@ -86,7 +96,7 @@ public class Emulator : Game
         if(this.cpu.DrawFlag) {    
             base.Draw(gameTime);
             this.cpu.DrawFlag = false;
+            drawCounter++;
         }
-        drawCounter++;
     }
 }

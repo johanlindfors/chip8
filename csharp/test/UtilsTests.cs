@@ -5,12 +5,12 @@ public class UtilsTest
     [Fact]
     public void RegisterApplyTest()
     {
-        var register = new Chip8.Register();
-        register.Set(2, 4);
+        var registers = new Chip8.Registers();
+        registers[2] = 4;
         int x = 0;
         int y = 2;
-        register.Apply(x, vx => (byte)(vx | register.Get(y)));
+        registers.Apply(x, vx => (byte)(vx | registers[y]));
 
-        Assert.Equal(4, register.Get(0));
+        Assert.Equal(4, registers[0]);
     }
 }
