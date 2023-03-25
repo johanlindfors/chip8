@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C#: Emulator.XNA",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/src/Emulator.XNA/Emulator.XNA.csproj",
+            "launchConfigurationId": "TargetFramework=;Emulator.XNA"
+        }
+    ]
+}
