@@ -3,3 +3,5 @@
 **/zig-cache/*
 **/zig-out/*
 **/build/*
+**/target/*
+**/dependency-reduced-pom.xml
