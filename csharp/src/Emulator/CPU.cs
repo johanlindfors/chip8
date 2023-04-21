@@ -246,7 +246,6 @@ public class CPU
                     case 0x0A: // A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
                         for (int i = 0; i < keyboard.Length; i++) {
                             if(keyboard[i]){
-                                System.Console.WriteLine("Key pressed!");
                                 registers[x] = (byte)i;
                                 return 1;
                             }

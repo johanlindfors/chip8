@@ -46,7 +46,6 @@ public class Emulator : Game
         var registers = new Chip8.Registers();
         this.cpu = new Chip8.CPU(memory, registers, random, keyboard, screen);
 
-        GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap; 
         base.Initialize();
     }
 
@@ -62,7 +61,12 @@ public class Emulator : Game
         HandleInput();
 
         cpu.EmulateCycle();
-        base.Update(gameTime);
+
+        if(this.cpu.DrawFlag) {    
+            base.Update(gameTime);
+            this.cpu.DrawFlag = false;
+        }
+
         updateCounter++;
     }
 
@@ -82,21 +86,10 @@ public class Emulator : Game
 
     private void TestKey(Input.Keys key, Input.KeyboardState oldState, Input.KeyboardState newState) {
         if(newState.IsKeyDown(key) && oldState.IsKeyUp(key)) {
-            System.Console.WriteLine("A key was pressed!");
             keyboard.OnKeyPressed((int)key);
         } 
         if(oldState.IsKeyDown(key) && newState.IsKeyUp(key)) {
-            System.Console.WriteLine("A key was released!");
             keyboard.OnKeyReleased((int)key);
         }        
-    }
-
-    protected override void Draw(GameTime gameTime)
-    {
-        if(this.cpu.DrawFlag) {    
-            base.Draw(gameTime);
-            this.cpu.DrawFlag = false;
-            drawCounter++;
-        }
     }
 }

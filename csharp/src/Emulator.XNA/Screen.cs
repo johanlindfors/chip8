@@ -37,17 +37,9 @@ public class Screen : DrawableGameComponent, Chip8.IScreen
         }
     }
 
-    protected override void LoadContent()
-    {
-        base.LoadContent();
-
-    }
-
     public override void Update(GameTime gameTime)
     {
         canvas.SetData<uint>(pixels, 0, tracedSize.Width * tracedSize.Height);
-
-        base.Update(gameTime);
     }
 
     public override void Draw(GameTime gameTime)
@@ -65,8 +57,6 @@ public class Screen : DrawableGameComponent, Chip8.IScreen
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
         spriteBatch.Draw(target, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
         spriteBatch.End();
-
-        base.Draw(gameTime);
     }
 
     public void SetPixel(int xCoord, int yCoord) {
