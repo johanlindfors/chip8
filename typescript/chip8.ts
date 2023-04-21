@@ -15,7 +15,7 @@ class Emulator {
     }
 
     clearScreen() : void {
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = "red";
         this.ctx.fillRect(0, 0, this.width, this.height);
     }
 
