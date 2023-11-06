@@ -66,16 +66,16 @@ pub const CPU = struct {
     }
 
     fn getOpCode(self: *Self) u16 {
-        var opcode: u16 = @intCast(u16, self.memory.get(self.pc)) << 8 | self.memory.get(self.pc + 1);
+        var opcode = @as(u16, @intCast(self.memory.get(self.pc))) << 8 | self.memory.get(self.pc + 1);
         self.pc += 2;
         return opcode;
     }
 
     fn execute(self: *Self, opcode: u16, display: *Display, keyboard: *Keyboard) i32 {
-        var x: u8 = @intCast(u8, opcode >> 8 & 0x0F);
-        var y: u8 = @intCast(u8, opcode >> 4 & 0x0F);
-        var n: u8 = @intCast(u8, opcode & 0x000F);
-        var nn: u8 = @intCast(u8, opcode & 0x00FF);
+        var x: u8 = @intCast(opcode >> 8 & 0x0F);
+        var y: u8 = @intCast(opcode >> 4 & 0x0F);
+        var n: u8 = @intCast(opcode & 0x000F);
+        var nn: u8 = @intCast(opcode & 0x00FF);
         var nnn: u16 = opcode & 0x0FFF;
         switch(opcode & 0xF000) {
             0x0000 => switch (opcode & 0x00FF) {
@@ -169,12 +169,12 @@ pub const CPU = struct {
     // 0xDXYN
     fn opDisplay(self: *Self, x: u8, y: u8, n: u8, display: *Display) u16 {
     	var index = self.index;
-        var vx = @intCast(u16, self.registers[x]);
-        var vy = @intCast(u16, self.registers[y]);
+        var vx :u16 = @intCast(self.registers[x]);
+        var vy :u16 = @intCast(self.registers[y]);
         std.debug.print("Rendering a {} pixel tall sprite at X: {}, Y: {} from the address: {}\n", .{n, vx, vy, index});
 
         var row = vy;
-        while(row < vy + @intCast(u16,n)) : (row += 1) {
+        while(row < vy + @as(u16,@intCast(n))) : (row += 1) {
             if(row >= 32){
                 break;
             }
@@ -390,13 +390,13 @@ pub const CPU = struct {
 
     // 0x8XY4
     fn opAddWithCarry(self: *Self, x: u8, y: u8) u16 {
-        var sum = @intCast(u16, self.registers[x]) + @intCast(u16, self.registers[y]);
+        var sum = @as(u16, @intCast(self.registers[x])) + @as(u16, @intCast(self.registers[y]));
         if (sum > 255) {
             self.registers[0xF] = 1;
         } else {
             self.registers[0xF] = 0;
         }
-        self.registers[x] = @intCast(u8, sum & 0xFF);
+        self.registers[x] = @as(u8, @intCast(sum & 0xFF));
         return 200;
     }
 
