@@ -26,7 +26,9 @@ const (
 //export SineWave
 func SineWave(userdata unsafe.Pointer, stream *C.Uint8, length C.int) {
 	n := int(length)
-	hdr := reflect.SliceHeader{Data: uintptr(unsafe.Pointer(stream)), Len: n, Cap: n}
+	hdr := make([]C.Uint8, length)
+	sh := (*reflect.SliceHeader)(unsafe.Pointer(&hdr))
+	sh.Data = uintptr(unsafe.Pointer(stream))
 	buf := *(*[]C.Uint8)(unsafe.Pointer(&hdr))
 
 	var phase float64
