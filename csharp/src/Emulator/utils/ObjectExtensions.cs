@@ -1,7 +1,7 @@
 // Copyright (c) Coderox AB. All Rights Reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-namespace Chip8.Emulator;
+namespace Chip8;
 
 /// <summary>
 /// Extensions for objects.
