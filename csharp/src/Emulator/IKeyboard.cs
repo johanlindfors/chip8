@@ -9,13 +9,13 @@ namespace Chip8;
 public interface IKeyboard
 {
     /// <summary>
-    /// Event triggered on key pressed.
+    /// Sets a key pressed.
     /// </summary>
     /// <param name="keyCode">The key pressed.</param>
     void OnKeyPressed(int keyCode);
 
     /// <summary>
-    /// Event triggered on key released.
+    /// Sets a key released.
     /// </summary>
     /// <param name="keyCode">The key released.</param>
     void OnKeyReleased(int keyCode);
