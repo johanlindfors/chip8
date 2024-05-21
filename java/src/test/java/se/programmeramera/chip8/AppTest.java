@@ -1,4 +1,4 @@
-package se.programmeramera;
+package se.programmeramera.chip8;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

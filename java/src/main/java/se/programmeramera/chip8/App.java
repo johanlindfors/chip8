@@ -1,4 +1,4 @@
-package se.programmeramera;
+package se.programmeramera.chip8;
 
 /**
  * Hello world!
