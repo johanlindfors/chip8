@@ -56,7 +56,7 @@ public class Emulator : Game
         var screen = new Screen(this, WIDTH, HEIGHT, SCALE);
         this.Components.Add(screen);
 
-        var random = new System.Random();
+        var random = new RandomNumberGenerator();
         var register = new Register();
         this.cpu = new CPU(this.memory, register, random, this.keyboard, screen);
 
