@@ -3,4 +3,5 @@
 **/zig-cache/*
 **/zig-out/*
 **/build/*
-.Ds_Store
+**/target/*
+**/.DS_Store

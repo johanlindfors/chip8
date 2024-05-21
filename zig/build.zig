@@ -1,13 +1,21 @@
 const std = @import("std");
 
-pub fn build(b: *std.build.Builder) void {
-    const mode = b.standardReleaseOptions();
-    const exe = b.addExecutable("chip8", "src/main.zig");
-    exe.setBuildMode(mode);
+pub fn build(b: *std.Build) void {
+    const optimize = b.standardOptimizeOption(.{});
+    const target = b.standardTargetOptions(.{});
+    
+    const exe = b.addExecutable(.{
+        .name = "chip8",
+        .root_source_file = .{ .path = "src/main.zig" },
+        .optimize = optimize,
+        .target = target
+    });
 
-    exe.addIncludePath("/usr/local/include/SDL2");
-    exe.addLibraryPath("/usr/local/lib");
+    exe.addIncludePath(.{ .path = "/usr/local/include/SDL2"});
+    exe.addLibraryPath(.{ .path = "/usr/local/lib"});
     exe.linkSystemLibrary("sdl2");
     exe.linkLibC();
-    exe.install();
+    
+    const install_exe = b.addInstallArtifact(exe, .{});
+    b.getInstallStep().dependOn(&install_exe.step); 
 }

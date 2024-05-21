@@ -5,7 +5,7 @@ const Emulator = @import("emulator.zig").Emulator;
 
 pub fn main() anyerror!void {
     var gpalloc = std.heap.GeneralPurposeAllocator(.{}){};
-    defer std.debug.assert(!gpalloc.deinit());
+    defer std.debug.assert(gpalloc.deinit() == .ok);
     const allocator = gpalloc.allocator();
 
     const args = try std.process.argsAlloc(allocator);

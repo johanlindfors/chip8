@@ -36,7 +36,7 @@ pub const Display = struct {
             var x: usize = 0;
             while (x < 64) : (x += 1) {
                 if(self.frameBuffer[y * 64 + x]){
-                    var rect = sdl.SDL_Rect{ .x = @intCast(i16, x * 10), .y = @intCast(i16, y * 10), .w = 10, .h = 10 };
+                    var rect = sdl.SDL_Rect{ .x = @intCast(x * 10), .y = @intCast(y * 10), .w = 10, .h = 10 };
                     _ = sdl.SDL_RenderFillRect(self.renderer, &rect);
                 }
             }
