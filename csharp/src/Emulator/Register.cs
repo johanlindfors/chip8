@@ -22,20 +22,14 @@ public class Register
     }
 
     /// <summary>
-    /// Gets the register of index.
+    /// Gets or sets the register value.
     /// </summary>
-    /// <param name="index">The register.</param>
-    /// <returns>The data.</returns>
-    public byte Get(int index) => this.v[index];
-
-    /// <summary>
-    /// Sets the register.
-    /// </summary>
-    /// <param name="index">The register.</param>
-    /// <param name="value">The data.</param>
-    public void Set(int index, byte value)
+    /// <param name="index">Which register.</param>
+    /// <returns>Return value.</returns>
+    public byte this[int index]
     {
-        this.v[index] = value;
+        get { return this.v[index]; }
+        set { this.v[index] = value; }
     }
 
     /// <summary>

@@ -76,8 +76,8 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
 
         int x = (opcode & 0x0F00) >> 8;
         int y = (opcode & 0x00F0) >> 4;
-        byte vx = this.register.Get(x);
-        byte vy = this.register.Get(y);
+        byte vx = this.register[x];
+        byte vy = this.register[y];
         byte n = (byte)(opcode & 0x000F);
         byte nn = (byte)(opcode & 0x00FF);
         int nnn = opcode & 0x0FFF;
@@ -135,7 +135,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                 break;
 
             case 0x6000: // Sets vx to nn.
-                this.register.Set(x, nn);
+                this.register[x] = nn;
                 break;
 
             case 0x7000: // Adds nn to vx. (Carry flag is not changed)
@@ -147,7 +147,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                 switch (n)
                 {
                     case 0x0000: // Sets vx to the value of vy.
-                        this.register.Set(x, vy);
+                        this.register[x] = vy;
                         break;
 
                     case 0x0001: // Sets vx to vx or vy. (Bitwise OR operation)
@@ -166,29 +166,29 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                         this.register.Apply(x, vx =>
                         {
                             var sum = vx + vy;
-                            this.register.Set(0xF, (byte)(sum > 0xFF ? 1 : 0));
+                            this.register[0xF] = (byte)(sum > 0xFF ? 1 : 0);
                             return (byte)(sum & 0xFF);
                         });
                         break;
 
                     case 0x0005: // vy is subtracted from vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
-                        this.register.Set(0xF, (byte)(vy > vx ? 0 : 1));
+                        this.register[0xF] = (byte)(vy > vx ? 0 : 1);
                         this.register.Apply(x, vx => (byte)(vx - vy));
 
                         break;
 
                     case 0x0006: // Stores the least significant bit of vx in VF and then shifts vx to the right by 1.[2]
-                        this.register.Set(0xF, (byte)(vx & 0x1));
+                        this.register[0xF] = (byte)(vx & 0x1);
                         this.register.Apply(x, vx => (byte)(vx >> 1));
                         break;
 
                     case 0x0007: // Sets vx to vy minus vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
-                        this.register.Set(0xF, (byte)(vx > vy ? 0 : 1));
+                        this.register[0xF] = (byte)(vx > vy ? 0 : 1);
                         this.register.Apply(x, vx => (byte)((vy - vx) & 0xFF));
                         break;
 
                     case 0x000E: // Stores the most significant bit of vx in VF and then shifts vx to the left by 1.[3]
-                        this.register.Set(0xF, (byte)((vx & 0x80) > 0 ? 1 : 0));
+                        this.register[0xF] = (byte)((vx & 0x80) > 0 ? 1 : 0);
                         this.register.Apply(x, vx => (byte)((vx << 1) & 0xFF));
                         break;
                     default:
@@ -207,17 +207,17 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                 break;
 
             case 0xB000: // Jumps to the address nnn plus V0..
-                this.pc = (this.register.Get(0) + nnn) & 0x0FFF;
+                this.pc = (this.register[0] + nnn) & 0x0FFF;
                 break;
 
             case 0xC000: // Sets vx to the result of a bitwise and operation on a random number (Typically: 0 to 255) and nn.
-                this.register.Set(x, (byte)((this.random.Next() % 256) & nn));
+                this.register[x] = (byte)((this.random.Next() % 256) & nn);
                 break;
 
             case 0xD000: // Draws a sprite at coordinate (vx, vy) that has a width of 8 pixels and a height of n pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
                 int height = n;
 
-                this.register.Set(0xF, 0);
+                this.register[0xF] = 0;
 
                 for (int yLine = 0; yLine < height; yLine++)
                 {
@@ -242,7 +242,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
 
                             if (this.screen.GetPixel(xCoord, yCoord) == 1)
                             {
-                                this.register.Set(0xF, 1);
+                                this.register[0xF] = 1;
                             }
 
                             this.screen.SetPixel(xCoord, yCoord);
@@ -275,7 +275,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                 switch (nn)
                 {
                     case 0x07: // Sets vx to the value of the delay timer.
-                        this.register.Set(x, (byte)(this.delayTimer & 0xFF));
+                        this.register[x] = (byte)(this.delayTimer & 0xFF);
                         break;
 
                     case 0x0A: // A key press is awaited, and then stored in vx. (Blocking Operation. All instruction halted until next key event)
@@ -283,7 +283,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                         {
                             if (this.keyboard.IsPressed(i))
                             {
-                                this.register.Set(x, (byte)i);
+                                this.register[x] = (byte)i;
                                 break;
                             }
                         }
@@ -316,7 +316,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                     case 0x55: // Stores V0 to vx (including vx) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
                         for (int p = 0; p <= x; p++)
                         {
-                            this.memory.SetByte(this.i + p, (byte)this.register.Get(p));
+                            this.memory.SetByte(this.i + p, (byte)this.register[p]);
                         }
 
                         break;
@@ -324,7 +324,7 @@ public class CPU(Memory memory, Register register, Random random, IKeyboard keyb
                     case 0x65: // Fills V0 to vx (including vx) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
                         for (int p = 0; p <= x; p++)
                         {
-                            this.register.Set(p, (byte)(this.memory.GetByte(this.i + p) & 0xFF));
+                            this.register[p] = (byte)(this.memory.GetByte(this.i + p) & 0xFF);
                         }
 
                         break;
