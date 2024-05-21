@@ -23,7 +23,7 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal("1", register.Get(0).ToString("X"));
+        Assert.Equal("1", register[0].ToString("X"));
     }
 
     [Fact(DisplayName = "code 2XXX jump to subroutine")]
@@ -104,7 +104,7 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal("1", register.Get(0).ToString("X"));
+        Assert.Equal("1", register[0].ToString("X"));
     }
 
     [Fact(DisplayName = "code 7XNN Adds NN to VX")]
@@ -114,7 +114,7 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(2, register.Get(0));
+        Assert.Equal(2, register[0]);
     }
 
     [Fact(DisplayName = "code 7XNN Adds NN to VX and resolves overflow (Carry flag is not changed)")]
@@ -124,7 +124,7 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(254, register.Get(0));
+        Assert.Equal(254, register[0]);
     }
 
     [Fact(DisplayName = "code 8XY0 Sets VX to the value of VY.")]
@@ -135,10 +135,10 @@ public class EmulatorTest
 
         cpu.EmulateCycle();
         cpu.EmulateCycle();
-        Assert.Equal("1", register.Get(0).ToString("X"));
+        Assert.Equal("1", register[0].ToString("X"));
 
         cpu.EmulateCycle();
-        Assert.Equal("2", register.Get(0).ToString("X"));
+        Assert.Equal("2", register[0].ToString("X"));
     }
 
     [Fact(DisplayName = "code 8XY1 Sets VX to VX or VY. (Bitwise OR operation)")]
@@ -149,7 +149,7 @@ public class EmulatorTest
 
         Emulate(data);
 
-        Assert.Equal(7, register.Get(0));
+        Assert.Equal(7, register[0]);
     }
 
     [Fact(DisplayName = "code 8XY2 Sets VX to VX and VY. (Bitwise AND operation)")]
@@ -160,7 +160,7 @@ public class EmulatorTest
 
         Emulate(data);
 
-        Assert.Equal(4, register.Get(0));
+        Assert.Equal(4, register[0]);
     }
 
     [Fact(DisplayName = "code 8XY3 Sets VX to VX xor VY.")]
@@ -170,7 +170,7 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(12, register.Get(0));
+        Assert.Equal(12, register[0]);
     }
 
     [Fact(DisplayName = "code 8XY4 Adds VY to VX. VF is set to 0 when there's no carry.")]
@@ -180,8 +180,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(2, register.Get(0));
-        Assert.Equal(0, register.Get(0xF));
+        Assert.Equal(2, register[0]);
+        Assert.Equal(0, register[0xF]);
     }
 
     [Fact(DisplayName = "code 8XY4 Adds VY to VX. VF is set to 1 when there's a carry")]
@@ -191,8 +191,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(226, register.Get(0));
-        Assert.Equal(1, register.Get(0xF));
+        Assert.Equal(226, register[0]);
+        Assert.Equal(1, register[0xF]);
     }
 
     [Fact(DisplayName = "code 8XY5 VY is subtracted from VX. VF is set to 1 when there's no borrow")]
@@ -202,8 +202,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(1, register.Get(0));
-        Assert.Equal(1, register.Get(0xF));
+        Assert.Equal(1, register[0]);
+        Assert.Equal(1, register[0xF]);
     }
 
     [Fact(DisplayName = "code 8XY5 VY is subtracted from VX. VF is set to 1 when there's no borrow")]
@@ -213,8 +213,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(255, register.Get(0));
-        Assert.Equal(0, register.Get(0xF));
+        Assert.Equal(255, register[0]);
+        Assert.Equal(0, register[0xF]);
     }
 
     [Fact(DisplayName = "code 8XY6 Stores the least significant bit of VX in VF and then shifts VX to the right by 1.")]
@@ -225,8 +225,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(1, register.Get(0));
-        Assert.Equal(1, register.Get(0xF));
+        Assert.Equal(1, register[0]);
+        Assert.Equal(1, register[0xF]);
 
     }
 
@@ -238,8 +238,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(1, register.Get(0));
-        Assert.Equal(0, register.Get(0xF));
+        Assert.Equal(1, register[0]);
+        Assert.Equal(0, register[0xF]);
 
     }
 
@@ -251,8 +251,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(1, register.Get(0));
-        Assert.Equal(1, register.Get(0xF));
+        Assert.Equal(1, register[0]);
+        Assert.Equal(1, register[0xF]);
     }
 
     [Fact(DisplayName = "code 8XY7 Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.")]
@@ -263,8 +263,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(255, register.Get(0));
-        Assert.Equal(0, register.Get(0xF));
+        Assert.Equal(255, register[0]);
+        Assert.Equal(0, register[0xF]);
     }
 
     [Fact(DisplayName = "code 8XYE Stores the most significant bit of VX in VF and then shifts VX to the left by 1")]
@@ -275,8 +275,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(1, register.Get(0xF));
-        Assert.Equal(254, register.Get(0));
+        Assert.Equal(1, register[0xF]);
+        Assert.Equal(254, register[0]);
     }
 
     [Fact(DisplayName = "code 8XYE Stores the most significant bit of VX in VF and then shifts VX to the left by 1")]
@@ -287,8 +287,8 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(0, register.Get(0xF));
-        Assert.Equal(2, register.Get(0));
+        Assert.Equal(0, register[0xF]);
+        Assert.Equal(2, register[0]);
     }
 
     [Fact(DisplayName = "code 9XY0 Skips the next instruction when VX doesn't equal VY")]
@@ -395,7 +395,7 @@ public class EmulatorTest
         memory.LoadData(data);
         Emulate(data);
 
-        Assert.Equal(1, register.Get(0));
+        Assert.Equal(1, register[0]);
     }
 
     private void Emulate(byte[] data) {

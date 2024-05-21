@@ -6,11 +6,11 @@ public class UtilsTest
     public void RegisterApplyTest()
     {
         var register = new Chip8.Register();
-        register.Set(2, 4);
+        register[2] = 4;
         int x = 0;
         int y = 2;
-        register.Apply(x, vx => (byte)(vx | register.Get(y)));
+        register.Apply(x, vx => (byte)(vx | register[y]));
 
-        Assert.Equal(4, register.Get(0));
+        Assert.Equal(4, register[0]);
     }
 }
