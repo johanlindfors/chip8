@@ -58,8 +58,8 @@ public class Emulator : Game
         this.Components.Add(screen);
 
         var random = new RandomNumberGenerator();
-        var register = new Register();
-        this.cpu = new CPU(this.memory, register, random, this.keyboard, screen);
+        var registers = new Registers();
+        this.cpu = new CPU(this.memory, registers, random, this.keyboard, screen);
 
         this.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 
