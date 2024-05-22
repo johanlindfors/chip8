@@ -5,6 +5,7 @@ namespace Chip8;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Xml.Schema;
 using Input = Microsoft.Xna.Framework.Input;
 
 /// <summary>
@@ -57,8 +58,8 @@ public class Emulator : Game
         this.Components.Add(screen);
 
         var random = new RandomNumberGenerator();
-        var register = new Register();
-        this.cpu = new CPU(this.memory, register, random, this.keyboard, screen);
+        var registers = new Registers();
+        this.cpu = new CPU(this.memory, registers, random, this.keyboard, screen);
 
         this.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 

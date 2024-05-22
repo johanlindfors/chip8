@@ -6,14 +6,14 @@ namespace Chip8;
 /// <summary>
 /// Implementation of the registers.
 /// </summary>
-public class Register
+public class Registers
 {
     private readonly byte[] v = new byte[16];
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Register"/> class.
+    /// Initializes a new instance of the <see cref="Registers"/> class.
     /// </summary>
-    public Register()
+    public Registers()
     {
         for (int i = 0; i < 16; i++)
         {
@@ -28,8 +28,8 @@ public class Register
     /// <returns>Return value.</returns>
     public byte this[int index]
     {
-        get { return this.v[index]; }
-        set { this.v[index] = value; }
+        get => this.v[index];
+        set => this.v[index] = value;
     }
 
     /// <summary>
