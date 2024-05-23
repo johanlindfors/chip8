@@ -1,0 +1,59 @@
+/// <reference path="keyboard.ts"/>
+
+const FONT = [
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80, // F
+] as const;
+
+interface ILoadProgram {
+    loadProgram(addr: number, data: Uint8Array) : void;
+}
+
+interface IMemory {
+    setByte(index: number, data: number) : void;
+    getByte(index: number) : number;
+    getOpCode(pc : number) : number;
+}
+
+class Memory {
+    private _memory : Uint8Array;
+
+    constructor() {
+        this._memory = new Uint8Array(4096);
+        for (let index = 0; index < 80; index++) {
+            this.setByte(0x50 + index, FONT[index]);
+        }
+    }
+
+    loadProgram(addr : number, data : Uint8Array) : void {
+        for (let index = 0; index < data.length; index++) {
+            this.setByte(index + addr, data[index]);
+        }
+    }
+
+    setByte(index: number, data: number) : void {
+        this._memory[index] = data & 0xFF;
+    }
+
+    getByte(index: number) : number {
+        return this._memory[index] & 0xFF;
+    }
+
+    getOpCode(pc : number) : number {
+        return this.getByte(pc) << 8 | this.getByte(pc + 1); 
+    }
+}
