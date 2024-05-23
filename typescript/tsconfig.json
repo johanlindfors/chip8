@@ -5,10 +5,10 @@
         "outFile": "chip8.js",
         "sourceMap": true
     },
-    // "include": [
-    //     "source/**/*",
+    "include": [
+         "src/**/*",
     //     "../utils/*",
     //     "../types/*",
     //     "../../phaser/types/phaser.d.ts"
-    // ]
+    ]
 }
