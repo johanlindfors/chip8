@@ -30,7 +30,7 @@ class Emulator {
 
     initialize() : void {
         let client = new ApiClient();
-        client.getRom("15PUZZLE.ch8")
+        client.getRom("roms/15PUZZLE.ch8")
             .then(rom => {
                 const theRom = new Uint8Array(rom);
                 this.memory.loadProgram(0x0200, theRom);
