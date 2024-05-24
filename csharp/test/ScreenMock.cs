@@ -46,4 +46,12 @@ public class ScreenMock : IScreen
     {
         throw new NotImplementedException();
     }
+
+    /// <summary>
+    /// Sets the draw flag.
+    /// </summary>
+    public void SetDrawFlag()
+    {
+        throw new NotImplementedException();
+    }
 }
