@@ -24,25 +24,27 @@ class CPU {
     get PC() : number { return this._pc; }
     get I() : number { return this._i; }
 
-    constructor(keyboard : IKeyboard, display : IDisplay, memory : IMemory, audio : IAudio) {
-        this._registers = new Registers();
-        this._memory = memory;
+    constructor(keyboard : IKeyboard, display : IDisplay, audio : IAudio) {
         this._keyboard = keyboard;
         this._display = display;
         this._audio = audio;
+    }
+
+    attachMemory(memory : IMemory) : void {
+        this._memory = memory;
+        this._display.clear();
+        this._audio.stop();
+        this._registers = new Registers();
         this._pc = 0x200;
         this._instructionsCounter = 0;
         this._stack = [];
         this._microseconds = 0;
     }
 
-    doWork() : void {
-        if(this._keyboard.isKeyPressed(0x3)){
-            console.debug("3");
-        }
-    }
-
     tick() : void {
+        if(this._memory == null)
+            return;
+        
         if (this.DelayTimer > 0) {
             this.DelayTimer -= 1;
         }
