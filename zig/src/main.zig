@@ -16,7 +16,7 @@ pub fn main() anyerror!void {
     }
     const fileName = args[1];
 
-    const file = try std.fs.cwd().openFile(fileName, .{.mode = .read_only});
+    const file = try std.fs.cwd().openFile(fileName, .{ .mode = .read_only });
     defer file.close();
 
     var buffer: [1024 * 4]u8 = undefined;

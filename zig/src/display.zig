@@ -4,14 +4,17 @@ const sdl = @cImport({
 });
 
 pub const IDisplay = struct {
-    // can call directly: iface.pickFn(iface)
+    initializeSDLFn: fn (*IDisplay) void,
     drawFn: fn (*IDisplay) void,
     clearFn: fn (*IDisplay) void,
-    setDrawFlagFn: fn (*IDisplay) void,
-    flipPixelFn: fn (*IDisplay) void,
+    setDrawFlagFn: fn (*IDisplay, bool) void,
+    flipPixelFn: fn (*IDisplay, usize) void,
 
-    // allows calling: iface.pick()
-    pub fn pick(display: *IDisplay) i32 {
+    pub fn initializeSDL(display: *IDisplay) void {
+        return display.initializeSDLFn(display);
+    }
+
+    pub fn draw(display: *IDisplay) i32 {
         return display.drawFn(display);
     }
 
@@ -28,33 +31,26 @@ pub const IDisplay = struct {
     }
 };
 
-pub const FakeDisplay = struct {
-    interface: IDisplay,
+// pub const FakeDisplay = struct {
+//     interface: IDisplay,
 
-    const Self = @This();
+//     const Self = @This();
 
-    pub fn init() Self {
-        return FakeDisplay {
-            .interface = IDisplay {
-                .drawFn = draw,
-                .clearFn = clear,
-                .setDrawFlagFn = setDrawFlag,
-                .flipPixelFn = flipPixel
-            }
-        };
-    }
+//     pub fn init() Self {
+//         return FakeDisplay{ .interface = IDisplay{ .drawFn = draw, .clearFn = clear, .setDrawFlagFn = setDrawFlag, .flipPixelFn = flipPixel } };
+//     }
 
-    pub fn draw(_: *IDisplay) void { }
+//     pub fn draw(_: *IDisplay) void {}
 
-    pub fn clear(_: *IDisplay) void { }
+//     pub fn clear(_: *IDisplay) void {}
 
-    pub fn setDrawFlag(_: *IDisplay, _: bool) void { }
+//     pub fn setDrawFlag(_: *IDisplay, _: bool) void {}
 
-    pub fn flipPixel(_: *IDisplay, _: usize) void { }
-};
+//     pub fn flipPixel(_: *IDisplay, _: usize) void {}
+// };
 
 pub const Display = struct {
-    frameBuffer: [64*32]bool,
+    frameBuffer: [64 * 32]bool,
     renderer: ?*sdl.SDL_Renderer,
     window: ?*sdl.SDL_Window,
     drawFlag: bool,
@@ -64,29 +60,24 @@ pub const Display = struct {
     const Self = @This();
 
     pub fn init() Self {
+        // _ = sdl.SDL_Init(sdl.SDL_INIT_VIDEO);
+
+        // const window = sdl.SDL_CreateWindow("hello gamedev", sdl.SDL_WINDOWPOS_CENTERED, sdl.SDL_WINDOWPOS_CENTERED, 640, 320, 0);
+
+        // const renderer = sdl.SDL_CreateRenderer(window, 0, sdl.SDL_RENDERER_PRESENTVSYNC);
+
+        return Display{ .frameBuffer = [_]bool{false} ** 2048, .window = null, .renderer = null, .drawFlag = false, .interface = IDisplay{ .initializeSDLFn = initializeSDL, .drawFn = draw, .clearFn = clear, .setDrawFlagFn = setDrawFlag, .flipPixelFn = flipPixel } };
+    }
+
+    pub fn initializeSDL(idisplay: *IDisplay) void {
         _ = sdl.SDL_Init(sdl.SDL_INIT_VIDEO);
-        
-        var window = sdl.SDL_CreateWindow("hello gamedev", sdl.SDL_WINDOWPOS_CENTERED, sdl.SDL_WINDOWPOS_CENTERED, 640, 320, 0);
-
-        var renderer = sdl.SDL_CreateRenderer(window, 0, sdl.SDL_RENDERER_PRESENTVSYNC);
-
-        return Display {
-            .frameBuffer = [_]bool{false} ** 2048,
-            .renderer = renderer,
-            .window = window,
-            .drawFlag = false,
-
-            .interface = IDisplay {
-                .drawFn = draw,
-                .clearFn = clear,
-                .setDrawFlagFn = setDrawFlag,
-                .flipPixelFn = flipPixel
-            }
-        };
+        const self: *Display = @fieldParentPtr("interface", idisplay);
+        self.window = sdl.SDL_CreateWindow("hello gamedev", sdl.SDL_WINDOWPOS_CENTERED, sdl.SDL_WINDOWPOS_CENTERED, 640, 320, 0);
+        self.renderer = sdl.SDL_CreateRenderer(self.window, 0, sdl.SDL_RENDERER_PRESENTVSYNC);
     }
 
     pub fn draw(idisplay: *IDisplay) void {
-        const self = @fieldParentPtr(Display, "interface", idisplay);
+        const self: *Display = @fieldParentPtr("interface", idisplay);
 
         _ = sdl.SDL_SetRenderDrawColor(self.renderer, 0x00, 0x00, 0x00, 0xff);
         _ = sdl.SDL_RenderClear(self.renderer);
@@ -96,7 +87,7 @@ pub const Display = struct {
         while (y < 32) : (y += 1) {
             var x: usize = 0;
             while (x < 64) : (x += 1) {
-                if(self.frameBuffer[y * 64 + x]){
+                if (self.frameBuffer[y * 64 + x]) {
                     var rect = sdl.SDL_Rect{ .x = @intCast(x * 10), .y = @intCast(y * 10), .w = 10, .h = 10 };
                     _ = sdl.SDL_RenderFillRect(self.renderer, &rect);
                 }
@@ -107,19 +98,19 @@ pub const Display = struct {
     }
 
     pub fn clear(idisplay: *IDisplay) void {
-        const self = @fieldParentPtr(Display, "interface", idisplay);
+        const self: *Display = @fieldParentPtr("interface", idisplay);
 
         self.frameBuffer = [_]bool{false} ** 2048;
     }
 
     pub fn setDrawFlag(idisplay: *IDisplay, value: bool) void {
-        const self = @fieldParentPtr(Display, "interface", idisplay);
+        const self: *Display = @fieldParentPtr("interface", idisplay);
 
         self.drawFlag = value;
     }
 
     pub fn flipPixel(idisplay: *IDisplay, position: usize) void {
-        const self = @fieldParentPtr(Display, "interface", idisplay);
+        const self: *Display = @fieldParentPtr("interface", idisplay);
 
         self.frameBuffer[position] = !self.frameBuffer[position];
     }
