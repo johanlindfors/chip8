@@ -22,7 +22,6 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
     private readonly IKeyboard keyboard = keyboard;
     private readonly IScreen screen = screen;
     private Stack<int> stack = new Stack<int>();
-    private bool drawFlag;
     private int i = 0;
     private int pc = 0x200;
     private byte delayTimer;
@@ -40,15 +39,6 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
     {
         get { return this.delayTimer; }
         set { this.delayTimer = value; }
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the draw flag is set.
-    /// </summary>
-    public bool DrawFlag
-    {
-        get { return this.drawFlag; }
-        set { this.drawFlag = value; }
     }
 
     /// <summary>
@@ -88,7 +78,7 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
         {
             case 0x00E0: // Clears the screen
                 this.screen.Clear();
-                this.drawFlag = true;
+                this.screen.SetDrawFlag();
                 return;
 
             case 0x00EE: // Returns from a subroutine.
@@ -250,7 +240,7 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                     }
                 }
 
-                this.drawFlag = true;
+                this.screen.SetDrawFlag();
                 break;
 
             case 0xE000:

@@ -93,12 +93,7 @@ public class Emulator : Game
     /// <param name="gameTime">Used for timing.</param>
     protected override void Draw(GameTime gameTime)
     {
-        if (this.cpu.DrawFlag)
-        {
-            base.Draw(gameTime);
-            this.cpu.DrawFlag = false;
-        }
-
+        base.Draw(gameTime);
         this.drawCounter++;
     }
 
