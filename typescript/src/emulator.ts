@@ -13,30 +13,38 @@ class Emulator {
     cpu: CPU;
     keyboard: IKeyboard;
     display: IDisplay;
-    memory: ILoadProgram;
         
     constructor() {
         let surface = <HTMLCanvasElement>document.getElementById("surface");
+        let input = <HTMLCanvasElement>document.getElementById("selectRom");
+        input.addEventListener("change", (e) => {
+            this.loadRom(e);
+        });
+
         this.ctx = surface.getContext("2d")!;
         this.width = surface.clientWidth;
         this.height = surface.clientHeight;
         this.keyboard = new Keyboard();
         this.display = new Display(64, 32);
-        let memory = new Memory();
-        this.memory = memory;
         let audio = new AudioPlayer();
-        this.cpu = new CPU(this.keyboard, this.display, memory, audio);
+        this.cpu = new CPU(this.keyboard, this.display, audio);
     }
 
-    initialize() : void {
-        let client = new ApiClient();
-        client.getRom("roms/15PUZZLE.ch8")
-            .then(rom => {
-                const theRom = new Uint8Array(rom);
-                this.memory.loadProgram(0x0200, theRom);
-            });
-    }
-    
+    loadRom = async (event) => {
+        let fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(event.target.files[0]);
+
+        fileReader.onload = () => {
+            let rom = new Uint8Array(fileReader.result as ArrayBuffer);
+            let memory = new Memory();
+            memory.loadProgram(0x0200, rom);
+            this.cpu.attachMemory(memory);
+        };
+
+        fileReader.onerror = (error) => {
+            console.error(error);
+        };;
+    };
 
     clearScreen() : void {
         this.ctx.fillStyle = "red";
@@ -55,13 +63,11 @@ class Emulator {
     }
 
     draw() : void {
-        //this.clearScreen();
         this.display.draw(this.ctx);
     }
 }
 
 let emulator = new Emulator();
-emulator.initialize();
 
 function keyDown(evt) : void {
     emulator.handleInput(evt, true);
