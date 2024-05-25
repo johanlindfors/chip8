@@ -57,8 +57,9 @@ public class Emulator : Game
         this.Components.Add(screen);
 
         var random = new RandomNumberGenerator();
-        var register = new Register();
-        this.cpu = new CPU(this.memory, register, random, this.keyboard, screen);
+        var registers = new Registers();
+        var audio = new AudioPlayer();
+        this.cpu = new CPU(this.memory, registers, random, this.keyboard, screen, audio);
 
         this.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 
@@ -92,12 +93,7 @@ public class Emulator : Game
     /// <param name="gameTime">Used for timing.</param>
     protected override void Draw(GameTime gameTime)
     {
-        if (this.cpu.DrawFlag)
-        {
-            base.Draw(gameTime);
-            this.cpu.DrawFlag = false;
-        }
-
+        base.Draw(gameTime);
         this.drawCounter++;
     }
 

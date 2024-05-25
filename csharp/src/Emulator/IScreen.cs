@@ -37,4 +37,9 @@ public interface IScreen
     /// <param name="yCoord">The y-coordinate.</param>
     /// <returns>The value at the coordinate.</returns>
     uint GetPixel(int xCoord, int yCoord);
+
+    /// <summary>
+    /// Sets the draw flag.
+    /// </summary>
+    void SetDrawFlag();
 }
