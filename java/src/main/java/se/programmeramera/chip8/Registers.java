@@ -1,23 +1,23 @@
 package se.programmeramera.chip8;
 
 interface RegisterFunction{
-    byte run(byte input);
+    Integer run(Integer input);
 }
   
 public class Registers {
-    private byte[] registers;
+    private Integer[] registers;
 
     public Registers() {
         super();
 
-        this.registers = new byte[16];
+        this.registers = new Integer[16];
     }
 
-    public byte get(int register) {
+    public Integer get(int register) {
         return this.registers[register];
     }
 
-    public void set(int register, byte value) {
+    public void set(int register, Integer value) {
         this.registers[register] = value;
     }
 

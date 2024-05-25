@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Emulator",
+            "request": "launch",
+            "mainClass": "se.programmeramera.chip8.Emulator",
+            "projectName": "chip8",
+            "args": [
+                "../resources/roms/15PUZZLE.ch8"
+                //"./resources/roms/test/chip8-test-suite.ch8"
+                //"./resources/roms/test/OPCODE_TEST.ch8"
+                //"../resources/roms/test/TEST_OPCODE.ch8"
+            ]
+        }
+    ]
+}

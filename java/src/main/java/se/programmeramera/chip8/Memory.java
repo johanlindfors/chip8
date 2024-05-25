@@ -1,6 +1,5 @@
 package se.programmeramera.chip8;
 
-import java.nio.charset.Charset;
 import java.util.HexFormat;
 
 public class Memory {
@@ -22,16 +21,15 @@ public class Memory {
             "F0:80:F0:80:F0:" + // E
             "F0:80:F0:80:80"); // F
 
-    private final byte[] IBM = "AOCiKmAMYQjQH3AJojnQH6JIcAjQH3AEolfQH3AIombQH3AIonXQHxIo/wD/ADwAPAA8ADwA/wD//wD/ADgAPwA/ADgA/wD/gADgAOAAgACAAOAA4ACA+AD8AD4APwA7ADkA+AD4AwAHAA8AvwD7APMA4wBD4ADgAIAAgACAAIAA4ADg".getBytes(Charset.forName("UTF-8"));
-    private final byte[] IBM2 = HexFormat.ofDelimiter(":")
-        .parseHex("00:E0:A2:2A:60:0C");
-    private final byte[] IBM3 = {0x00, (byte)0xE0, (byte)0xA2, 0x2A, 0x60, 0x0C};
-    private byte[] memory;
+    private int[] memory;
 
     public Memory() {
         super();
-        this.memory = new byte[4096];
-        System.arraycopy(FONTS, 0, memory, 0x0050, FONTS.length);
+        this.memory = new int[4096];
+        for (int i = 0; i < FONTS.length; i++) {
+            this.memory[i + 0x50] = FONTS[i] & 0xFF;
+        }
+        //System.arraycopy(FONTS, 0, memory, 0x0050, FONTS.length);
         // byte[] rom = java.util.Base64.getDecoder().decode(IBM);
         // System.arraycopy(rom, 0, memory, 0x0200, rom.length);
     }
@@ -40,19 +38,19 @@ public class Memory {
     {
         for (int i = 0; i < data.length; i++)
         {
-            this.setByte(i + 512, (byte)(data[i] & 0xFF));
+            this.setByte(i + 512, (data[i] & 0xFF));
         }
     }
 
-    public int getOpCode(int pc) {
+    public Integer getOpCode(Integer pc) {
         return this.getByte(pc) << 8 | this.getByte(pc + 1);
     }
 
-    public byte getByte(int address) {
+    public Integer getByte(Integer address) {
         return this.memory[address];
     }
 
-    public void setByte(int address, byte value) {
+    public void setByte(Integer address, Integer value) {
         this.memory[address] = value;
     }
 }

@@ -1,7 +1,11 @@
 package se.programmeramera.chip8;
 
-public interface Keyboard {
-    boolean isKeyPressed(byte key);
+import javax.swing.JPanel;
 
-    byte[] getKeys();
+public interface Keyboard {
+    void addKeyBindings(JPanel panel);
+
+    boolean isKeyPressed(Integer key);
+
+    boolean[] getKeys();
 }
