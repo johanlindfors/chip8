@@ -5,7 +5,6 @@ namespace Chip8;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Xml.Schema;
 using Input = Microsoft.Xna.Framework.Input;
 
 /// <summary>
@@ -59,7 +58,8 @@ public class Emulator : Game
 
         var random = new RandomNumberGenerator();
         var registers = new Registers();
-        this.cpu = new CPU(this.memory, registers, random, this.keyboard, screen);
+        var audio = new AudioPlayer();
+        this.cpu = new CPU(this.memory, registers, random, this.keyboard, screen, audio);
 
         this.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 
@@ -93,12 +93,7 @@ public class Emulator : Game
     /// <param name="gameTime">Used for timing.</param>
     protected override void Draw(GameTime gameTime)
     {
-        if (this.cpu.DrawFlag)
-        {
-            base.Draw(gameTime);
-            this.cpu.DrawFlag = false;
-        }
-
+        base.Draw(gameTime);
         this.drawCounter++;
     }
 
