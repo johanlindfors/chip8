@@ -31,7 +31,6 @@ class CPU {
     }
 
     attachMemory(memory : IMemory) : void {
-        this._memory = memory;
         this._display.clear();
         this._audio.stop();
         this._registers = new Registers();
@@ -39,6 +38,7 @@ class CPU {
         this._instructionsCounter = 0;
         this._stack = [];
         this._microseconds = 0;
+        this._memory = memory;
     }
 
     tick() : void {
