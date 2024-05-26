@@ -19,6 +19,7 @@ public class Screen : DrawableGameComponent, Chip8.IScreen
     private Rectangle tracedSize;
     private SpriteBatch spriteBatch;
     private RenderTarget2D target;
+    private bool drawFlag;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Screen"/> class.
@@ -82,12 +83,17 @@ public class Screen : DrawableGameComponent, Chip8.IScreen
     /// <param name="gameTime">Time since last render.</param>
     public override void Draw(GameTime gameTime)
     {
-        this.GraphicsDevice.SetRenderTarget(this.target);
-        this.GraphicsDevice.Clear(Color.Black);
+        if (this.drawFlag)
+        {
+            this.GraphicsDevice.SetRenderTarget(this.target);
+            this.GraphicsDevice.Clear(Color.Black);
 
-        this.spriteBatch.Begin();
-        this.spriteBatch.Draw(this.canvas, new Rectangle(0, 0, this.tracedSize.Width, this.tracedSize.Height), Color.White);
-        this.spriteBatch.End();
+            this.spriteBatch.Begin();
+            this.spriteBatch.Draw(this.canvas, new Rectangle(0, 0, this.tracedSize.Width, this.tracedSize.Height), Color.White);
+            this.spriteBatch.End();
+
+            this.drawFlag = false;
+        }
 
         this.GraphicsDevice.SetRenderTarget(null);
         this.GraphicsDevice.Clear(Color.Black);
@@ -118,5 +124,13 @@ public class Screen : DrawableGameComponent, Chip8.IScreen
     public uint GetPixel(int xCoord, int yCoord)
     {
         return this.pixels[(yCoord * this.width) + xCoord];
+    }
+
+    /// <summary>
+    /// Sets the draw flag.
+    /// </summary>
+    public void SetDrawFlag()
+    {
+        this.drawFlag = true;
     }
 }

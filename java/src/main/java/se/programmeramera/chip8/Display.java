@@ -1,34 +1,27 @@
-// Copyright (c) Coderox AB. All Rights Reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+package se.programmeramera.chip8;
 
-namespace Chip8;
-
-/// <summary>
-/// The interface for a screen implementation.
-/// </summary>
-public interface IScreen
-{
+public interface Display {
     /// <summary>
     /// Gets the width of the screen.
     /// </summary>
-    int Width { get; }
+    int getDisplayWidth();
 
     /// <summary>
     /// Gets the height of the screen.
     /// </summary>
-    int Height { get; }
+    int getDisplayHeight();
 
     /// <summary>
     /// Clears the screen.
     /// </summary>
-    void Clear();
+    void clear();
 
     /// <summary>
     /// Sets the pixel a the specified coordinate.
     /// </summary>
     /// <param name="xCoord">The x-coordinate.</param>
     /// <param name="yCoord">The y-coordinate.</param>
-    void SetPixel(int xCoord, int yCoord);
+    void setPixel(int xCoord, int yCoord);
 
     /// <summary>
     /// Gets the pixel a the specified coordinate.
@@ -36,10 +29,7 @@ public interface IScreen
     /// <param name="xCoord">The x-coordinate.</param>
     /// <param name="yCoord">The y-coordinate.</param>
     /// <returns>The value at the coordinate.</returns>
-    uint GetPixel(int xCoord, int yCoord);
+    boolean getPixel(int xCoord, int yCoord);
 
-    /// <summary>
-    /// Sets the draw flag.
-    /// </summary>
-    void SetDrawFlag();
+    void setDrawFlag();
 }

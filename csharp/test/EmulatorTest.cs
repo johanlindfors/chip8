@@ -23,12 +23,14 @@ public class EmulatorTest
         this.random = new RandomNumberGeneratorMock();
         var screen = new ScreenMock();
         var keyboard = new KeyboardMock();
+        var audio = new AudioMock();
         this.cpu = new Chip8.CPU(
             this.memory,
             this.registers,
             this.random,
             keyboard,
-            screen);
+            screen,
+            audio);
     }
 
     [Fact(DisplayName = "code 1XXX jumps to address NNN")]

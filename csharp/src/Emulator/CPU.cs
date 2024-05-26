@@ -14,19 +14,22 @@ namespace Chip8;
 /// <param name="random">Instance of random module.</param>
 /// <param name="keyboard">Instance of a keyboard implementation.</param>
 /// <param name="screen">Instance of a screen implementation.</param>
-public class CPU(Memory memory, Registers registers, IRandomNumberGenerator random, IKeyboard keyboard, IScreen screen)
+/// <param name="audio">Instance of an audio implementation.</param>
+public class CPU(Memory memory, Registers registers, IRandomNumberGenerator random, IKeyboard keyboard, IScreen screen, IAudio audio)
 {
+    private const int FRAMETICKS = 16667;
     private readonly Memory memory = memory;
     private readonly Registers registers = registers;
     private readonly IRandomNumberGenerator random = random;
     private readonly IKeyboard keyboard = keyboard;
     private readonly IScreen screen = screen;
+    private readonly IAudio audio = audio;
     private Stack<int> stack = new Stack<int>();
-    private bool drawFlag;
     private int i = 0;
     private int pc = 0x200;
     private byte delayTimer;
     private byte soundTimer;
+    private int microseconds = 0;
 
     /// <summary>
     /// Gets the instructions counter.
@@ -40,15 +43,6 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
     {
         get { return this.delayTimer; }
         set { this.delayTimer = value; }
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the draw flag is set.
-    /// </summary>
-    public bool DrawFlag
-    {
-        get { return this.drawFlag; }
-        set { this.drawFlag = value; }
     }
 
     /// <summary>
@@ -67,9 +61,43 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
     public int I => this.i;
 
     /// <summary>
+    /// Updates the CPU.
+    /// </summary>
+    public void Tick()
+    {
+        if (this.delayTimer > 0)
+        {
+            this.delayTimer -= 1;
+        }
+
+        if (this.soundTimer > 0)
+        {
+            this.soundTimer -= 1;
+            if (!this.audio.IsPlaying)
+            {
+                this.audio.Start();
+            }
+        }
+        else if (this.audio.IsPlaying)
+        {
+            this.audio.Stop();
+        }
+
+        var delta = 0;
+        this.microseconds = FRAMETICKS;
+        do
+        {
+            delta = this.EmulateCycle();
+            this.microseconds -= delta;
+        }
+        while (this.microseconds > 0 || delta != 0);
+    }
+
+    /// <summary>
     /// Emulates a full CPU cycle.
     /// </summary>
-    public void EmulateCycle()
+    /// <returns>The number of clock cycles.</returns>
+    public int EmulateCycle()
     {
         this.InstructionsCounter++;
         int opcode = this.memory.GetOpcode(this.pc);
@@ -81,6 +109,7 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
         byte n = (byte)(opcode & 0x000F);
         byte nn = (byte)(opcode & 0x00FF);
         int nnn = opcode & 0x0FFF;
+        int clockCycles = 0;
 
         this.pc += 2;
 
@@ -88,12 +117,16 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
         {
             case 0x00E0: // Clears the screen
                 this.screen.Clear();
-                this.drawFlag = true;
-                return;
+                this.screen.SetDrawFlag();
+                return 109;
+
+            case 0x000E:
+                this.pc = this.i;
+                return 1;
 
             case 0x00EE: // Returns from a subroutine.
                 this.pc = this.stack.Pop();
-                return;
+                return 105;
 
             default:
                 break;
@@ -103,44 +136,58 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
         {
             case 0x1000: // Jumps to address nnn.
                 this.pc = nnn;
-                break;
+                return 105;
 
             case 0x2000: // Calls subroutine at nnn.
                 this.stack.Push(this.pc);
                 this.pc = nnn;
-                break;
+                return 105;
 
             case 0x3000: // Skips the next instruction if vx equals nn. (Usually the next instruction is a jump to skip a code block)
+                clockCycles = 55;
                 if (vx == nn)
                 {
                     this.pc += 2;
                 }
+                else
+                {
+                    clockCycles += 9;
+                }
 
-                break;
-
+                return clockCycles;
             case 0x4000: // Skips the next instruction if vx doesn't equal nn. (Usually the next instruction is a jump to skip a code block)
+                clockCycles = 55;
                 if (vx != nn)
                 {
                     this.pc += 2;
                 }
+                else
+                {
+                    clockCycles += 9;
+                }
 
-                break;
+                return clockCycles;
 
             case 0x5000: // Skips the next instruction if vx equals vy. (Usually the next instruction is a jump to skip a code block)
+                clockCycles = 55;
                 if (vx == vy)
                 {
                     this.pc += 2;
                 }
+                else
+                {
+                    clockCycles += 9;
+                }
 
-                break;
+                return clockCycles;
 
             case 0x6000: // Sets vx to nn.
                 this.registers[x] = nn;
-                break;
+                return 27;
 
             case 0x7000: // Adds nn to vx. (Carry flag is not changed)
                 this.registers.Apply(x, vx => (byte)((vx + nn) & 0xFF));
-                break;
+                return 45;
 
             case 0x8000:
                 {
@@ -148,19 +195,19 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                 {
                     case 0x0000: // Sets vx to the value of vy.
                         this.registers[x] = vy;
-                        break;
+                        return 200;
 
                     case 0x0001: // Sets vx to vx or vy. (Bitwise OR operation)
                         this.registers.Apply(x, vx => (byte)(vx | vy));
-                        break;
+                        return 200;
 
                     case 0x0002: // Sets vx to vx and vy. (Bitwise AND operation)
                         this.registers.Apply(x, vx => (byte)(vx & vy));
-                        break;
+                        return 200;
 
                     case 0x0003: // Sets vx to vx xor vy.
                         this.registers.Apply(x, vx => (byte)(vx ^ vy));
-                        break;
+                        return 200;
 
                     case 0x0004: // Adds vy to vx. VF is set to 1 when there's a carry, and to 0 when there isn't.
                         this.registers.Apply(x, vx =>
@@ -169,28 +216,27 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                             this.registers[0xF] = (byte)(sum > 0xFF ? 1 : 0);
                             return (byte)(sum & 0xFF);
                         });
-                        break;
+                        return 200;
 
                     case 0x0005: // vy is subtracted from vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
                         this.registers[0xF] = (byte)(vy > vx ? 0 : 1);
                         this.registers.Apply(x, vx => (byte)(vx - vy));
-
-                        break;
+                        return 200;
 
                     case 0x0006: // Stores the least significant bit of vx in VF and then shifts vx to the right by 1.[2]
                         this.registers[0xF] = (byte)(vx & 0x1);
                         this.registers.Apply(x, vx => (byte)(vx >> 1));
-                        break;
+                        return 200;
 
                     case 0x0007: // Sets vx to vy minus vx. VF is set to 0 when there's a borrow, and 1 when there isn't.
                         this.registers[0xF] = (byte)(vx > vy ? 0 : 1);
                         this.registers.Apply(x, vx => (byte)((vy - vx) & 0xFF));
-                        break;
+                        return 200;
 
                     case 0x000E: // Stores the most significant bit of vx in VF and then shifts vx to the left by 1.[3]
                         this.registers[0xF] = (byte)((vx & 0x80) > 0 ? 1 : 0);
                         this.registers.Apply(x, vx => (byte)((vx << 1) & 0xFF));
-                        break;
+                        return 200;
                     default:
                         break;
                     }
@@ -199,20 +245,29 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                 break;
 
             case 0x9000: // Skips the next instruction if vx doesn't equal vy. (Usually the next instruction is a jump to skip a code block)
-                this.pc += vx != vy ? 2 : 0;
-                break;
+                clockCycles = 73;
+                if (vx != vy)
+                {
+                    this.pc += 2;
+                }
+                else
+                {
+                    clockCycles += 9;
+                }
+
+                return clockCycles;
 
             case 0xA000: // Sets I to the address nnn.
                 this.i = nnn;
-                break;
+                return 55;
 
             case 0xB000: // Jumps to the address nnn plus V0..
                 this.pc = (this.registers[0] + nnn) & 0x0FFF;
-                break;
+                return 105;
 
             case 0xC000: // Sets vx to the result of a bitwise and operation on a random number (Typically: 0 to 255) and nn.
                 this.registers[x] = (byte)(this.random.NextByte() & nn);
-                break;
+                return 164;
 
             case 0xD000: // Draws a sprite at coordinate (vx, vy) that has a width of 8 pixels and a height of n pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
                 int height = n;
@@ -250,19 +305,19 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                     }
                 }
 
-                this.drawFlag = true;
-                break;
+                this.screen.SetDrawFlag();
+                return 22734;
 
             case 0xE000:
                 switch (nn)
                 {
                     case 0x9E: // Skips the next instruction if the key stored in vx is pressed. (Usually the next instruction is a jump to skip a code block)
                         this.pc += this.keyboard.IsPressed(vx) ? 2 : 0;
-                        break;
+                        return 73;
 
                     case 0xA1: // Skips the next instruction if the key stored in vx isn't pressed. (Usually the next instruction is a jump to skip a code block)
                         this.pc += this.keyboard.IsPressed(vx) ? 0 : 2;
-                        break;
+                        return 73;
 
                     default:
                         break;
@@ -276,7 +331,7 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                 {
                     case 0x07: // Sets vx to the value of the delay timer.
                         this.registers[x] = (byte)(this.delayTimer & 0xFF);
-                        break;
+                        return 45;
 
                     case 0x0A: // A key press is awaited, and then stored in vx. (Blocking Operation. All instruction halted until next key event)
                         for (int i = 0; i < this.keyboard.GetKeys().Length; i++)
@@ -284,34 +339,34 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                             if (this.keyboard.IsPressed(i))
                             {
                                 this.registers[x] = (byte)i;
-                                break;
+                                return 1;
                             }
                         }
 
                         this.pc -= 2;
-                        break;
+                        return 1;
 
                     case 0x15: // Sets the delay timer to vx.
                         this.delayTimer = (byte)(vx & 0xFF);
-                        return;
+                        return 45;
 
                     case 0x18: // Sets the sound timer to vx.
                         this.soundTimer = (byte)(vx & 0xFF);
-                        return;
+                        return 45;
 
                     case 0x1E: // Adds vx to I.
                         this.i += vx & 0xFF;
-                        break;
+                        return 86;
 
                     case 0x29: // Sets I to the location of the sprite for the character in vx. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
                         this.i = 0x50 + (vx * 5);
-                        break;
+                        return 91;
 
                     case 0x33: // vx, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2. (In other words, take the decimal representation of vx, place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.)
                         this.memory.SetByte(this.i, (byte)(vx / 100));
                         this.memory.SetByte(this.i + 1, (byte)((vx % 100) / 10));
                         this.memory.SetByte(this.i + 2, (byte)(vx % 10));
-                        break;
+                        return 927;
 
                     case 0x55: // Stores V0 to vx (including vx) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
                         for (int p = 0; p <= x; p++)
@@ -319,7 +374,7 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                             this.memory.SetByte(this.i + p, (byte)this.registers[p]);
                         }
 
-                        break;
+                        return 605 + (x * 64);
 
                     case 0x65: // Fills V0 to vx (including vx) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
                         for (int p = 0; p <= x; p++)
@@ -327,7 +382,7 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                             this.registers[p] = (byte)(this.memory.GetByte(this.i + p) & 0xFF);
                         }
 
-                        break;
+                        return 605 + (x * 64);
 
                     default:
                         break;
@@ -339,14 +394,6 @@ public class CPU(Memory memory, Registers registers, IRandomNumberGenerator rand
                 break;
         }
 
-        if (this.delayTimer > 0)
-        {
-            this.delayTimer -= 1;
-        }
-
-        if (this.soundTimer > 0)
-        {
-            this.soundTimer -= 1;
-        }
+        return 0;
     }
 }
