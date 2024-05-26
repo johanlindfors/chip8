@@ -46,7 +46,7 @@ public class Emulator {
             Memory memory = new Memory();
             byte[] rom = Files.readAllBytes(Paths.get(filename));
             memory.loadData(rom);
-            this.cpu = new CPU(display, keyboard, memory);
+            this.cpu = new CPU(display, keyboard, memory, new AudioDevice());
 
             // after setting the frame visible we start the game loop, this could be done in a button or wherever you want
             this.isRunning = true;

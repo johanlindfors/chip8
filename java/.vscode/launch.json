@@ -12,8 +12,8 @@
             "projectName": "chip8",
             "args": [
                 "../resources/roms/15PUZZLE.ch8"
-                //"./resources/roms/test/chip8-test-suite.ch8"
-                //"./resources/roms/test/OPCODE_TEST.ch8"
+                //"../resources/roms/test/chip8-test-rom-with-audio.ch8"
+                //"../resources/roms/test/OPCODE_TEST.ch8"
                 //"../resources/roms/test/TEST_OPCODE.ch8"
             ]
         }
