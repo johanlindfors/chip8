@@ -19,7 +19,7 @@ public class CPU {
     private Random random = new Random();
     private Audio audio;
 
-    public CPU(Display display, Keyboard keyboard, Memory memory) {
+    public CPU(Display display, Keyboard keyboard, Memory memory, Audio audio) {
         super();
         this.delayTimer = 0;
         this.soundTimer = 0;
@@ -31,6 +31,7 @@ public class CPU {
         this.keyboard = keyboard;
 
         this.memory = memory;
+        this.audio = audio;
     }
 
     public static int getBitValue(int value, int bitIndex) {
