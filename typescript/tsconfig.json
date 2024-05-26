@@ -7,8 +7,5 @@
     },
     "include": [
          "src/**/*",
-    //     "../utils/*",
-    //     "../types/*",
-    //     "../../phaser/types/phaser.d.ts"
     ]
 }
