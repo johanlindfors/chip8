@@ -1,78 +1,136 @@
+// Copyright (c) Coderox AB. All Rights Reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 namespace Chip8;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+/// <summary>
+/// The implementation of a screen component.
+/// </summary>
 public class Screen : DrawableGameComponent, Chip8.IScreen
 {
-    private readonly int width, height, scale;
+    private readonly int width;
+    private readonly int height;
+    private readonly int scale;
     private readonly uint[] pixels;
     private Texture2D canvas;
     private Rectangle tracedSize;
     private SpriteBatch spriteBatch;
-    RenderTarget2D target;
-    
-    public Screen(Game game, int width, int height, int scale) : base(game) {
+    private RenderTarget2D target;
+    private bool drawFlag;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Screen"/> class.
+    /// </summary>
+    /// <param name="game">Instance of the game.</param>
+    /// <param name="width">Width of screen.</param>
+    /// <param name="height">Height of screen.</param>
+    /// <param name="scale">Scale of screen.</param>
+    public Screen(Game game, int width, int height, int scale)
+        : base(game)
+    {
         this.width = width;
         this.height = height;
         this.scale = scale;
-        pixels = new uint[this.width * this.height];
-        Clear();
+        this.pixels = new uint[this.width * this.height];
+        this.Clear();
 
-        tracedSize = new Rectangle(0,0, width, height);
-        canvas = new Texture2D(GraphicsDevice, tracedSize.Width, tracedSize.Height, false, SurfaceFormat.Color);
+        this.tracedSize = new Rectangle(0, 0, width, height);
+        this.canvas = new Texture2D(this.GraphicsDevice, width, height, false, SurfaceFormat.Color);
 
-        target = new RenderTarget2D(GraphicsDevice, width, height);
-        spriteBatch = new SpriteBatch(GraphicsDevice);
+        this.target = new RenderTarget2D(this.GraphicsDevice, width, height);
+        this.spriteBatch = new SpriteBatch(this.GraphicsDevice);
     }
 
-    public int Width => width;
-    public int Height => height;
+    /// <summary>
+    /// Gets the width of the screen.
+    /// </summary>
+    public int Width => this.width;
 
-    public void Clear() {
+    /// <summary>
+    /// Gets the height of the screen.
+    /// </summary>
+    public int Height => this.height;
+
+    /// <summary>
+    /// Clears the screen.
+    /// </summary>
+    public void Clear()
+    {
         var length = this.height * this.width;
-        for (int i = 0; i < length; i++) {
-            pixels[i] = 0;
+        for (int i = 0; i < length; i++)
+        {
+            this.pixels[i] = 0;
         }
     }
 
-    protected override void LoadContent()
-    {
-        base.LoadContent();
-
-    }
-
+    /// <summary>
+    /// The update of the rendering loop.
+    /// </summary>
+    /// <param name="gameTime">Time since last update.</param>
     public override void Update(GameTime gameTime)
     {
-        canvas.SetData<uint>(pixels, 0, tracedSize.Width * tracedSize.Height);
+        this.canvas.SetData<uint>(this.pixels, 0, this.tracedSize.Width * this.tracedSize.Height);
 
         base.Update(gameTime);
     }
 
+    /// <summary>
+    /// Actual rendering.
+    /// </summary>
+    /// <param name="gameTime">Time since last render.</param>
     public override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.SetRenderTarget(target);
-        GraphicsDevice.Clear(Color.Black);
+        if (this.drawFlag)
+        {
+            this.GraphicsDevice.SetRenderTarget(this.target);
+            this.GraphicsDevice.Clear(Color.Black);
 
-        spriteBatch.Begin();
-        spriteBatch.Draw(canvas, new Rectangle(0, 0, tracedSize.Width, tracedSize.Height), Color.White);
-        spriteBatch.End();
+            this.spriteBatch.Begin();
+            this.spriteBatch.Draw(this.canvas, new Rectangle(0, 0, this.tracedSize.Width, this.tracedSize.Height), Color.White);
+            this.spriteBatch.End();
 
-        GraphicsDevice.SetRenderTarget(null);
-        GraphicsDevice.Clear(Color.Black);
+            this.drawFlag = false;
+        }
 
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        spriteBatch.Draw(target, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
-        spriteBatch.End();
+        this.GraphicsDevice.SetRenderTarget(null);
+        this.GraphicsDevice.Clear(Color.Black);
+
+        this.spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        this.spriteBatch.Draw(this.target, new Rectangle(0, 0, this.GraphicsDevice.Viewport.Width, this.GraphicsDevice.Viewport.Height), Color.White);
+        this.spriteBatch.End();
 
         base.Draw(gameTime);
     }
 
-    public void SetPixel(int xCoord, int yCoord) {
-        pixels[yCoord * this.width + xCoord] ^= 0xFFFFFFFF;
+    /// <summary>
+    /// Sets the pixel at provided coordinates.
+    /// </summary>
+    /// <param name="xCoord">X-value.</param>
+    /// <param name="yCoord">Y-value.</param>
+    public void SetPixel(int xCoord, int yCoord)
+    {
+        this.pixels[(yCoord * this.width) + xCoord] ^= 0xFFFFFFFF;
     }
 
-    public uint GetPixel(int xCoord, int yCoord) {
-        return pixels[yCoord * this.width + xCoord];
+    /// <summary>
+    /// Gets the pixel at provided coordinates.
+    /// </summary>
+    /// <param name="xCoord">X-value.</param>
+    /// <param name="yCoord">Y-value.</param>
+    /// <returns>The value of the pixel.</returns>
+    public uint GetPixel(int xCoord, int yCoord)
+    {
+        return this.pixels[(yCoord * this.width) + xCoord];
+    }
+
+    /// <summary>
+    /// Sets the draw flag.
+    /// </summary>
+    public void SetDrawFlag()
+    {
+        this.drawFlag = true;
     }
 }
