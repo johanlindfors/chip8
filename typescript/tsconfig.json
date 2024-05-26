@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {        
+        "target": "es2017",
+        "module": "system",
+        "outFile": "chip8.js",
+        "sourceMap": true
+    },
+    "include": [
+         "src/**/*",
+    ]
+}
