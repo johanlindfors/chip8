@@ -2,8 +2,18 @@ package se.programmeramera.chip8;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.awt.event.ActionEvent;
 
 public class Emulator {
 
@@ -38,22 +48,42 @@ public class Emulator {
         //this.addKeyBindings();
         this.setupGameLoop();
 
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuFile = new JMenu("File");
+        JMenuItem menuFileOpen = new JMenuItem(new AbstractAction("Open") {
+            public void actionPerformed(ActionEvent ev) {
+                JFileChooser fileChooser = new JFileChooser(); // create filechooser
+                int retVal = fileChooser.showOpenDialog(frame); // open the open dialog
+                if (retVal == JFileChooser.APPROVE_OPTION) {    // check for approval
+                    try {
+                        String filename = fileChooser.getSelectedFile().getAbsolutePath();
+                        Memory memory = new Memory();
+                        byte[] rom = Files.readAllBytes(Paths.get(filename));
+                        memory.loadData(rom);
+                        cpu.attachMemory(memory);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        menuFile.setMnemonic(KeyEvent.VK_F);
+        menuFileOpen.setMnemonic(KeyEvent.VK_O);
+
+        menuBar.add(menuFile);
+        menuFile.add(menuFileOpen);
+        frame.setJMenuBar(menuBar);
+
         frame.add(display);
         frame.pack();
         frame.setVisible(true);
 
-        try {
-            Memory memory = new Memory();
-            byte[] rom = Files.readAllBytes(Paths.get(filename));
-            memory.loadData(rom);
-            this.cpu = new CPU(display, keyboard, memory, new AudioDevice());
+        this.cpu = new CPU(display, keyboard, new AudioDevice());
 
-            // after setting the frame visible we start the game loop, this could be done in a button or wherever you want
-            this.isRunning = true;
-            this.gameLoop.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // after setting the frame visible we start the game loop, this could be done in a button or wherever you want
+        this.isRunning = true;
+        this.gameLoop.start();
     }
 
     /**

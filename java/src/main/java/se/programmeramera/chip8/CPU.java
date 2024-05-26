@@ -19,7 +19,7 @@ public class CPU {
     private Random random = new Random();
     private Audio audio;
 
-    public CPU(Display display, Keyboard keyboard, Memory memory, Audio audio) {
+    public CPU(Display display, Keyboard keyboard, Audio audio) {
         super();
         this.delayTimer = 0;
         this.soundTimer = 0;
@@ -29,9 +29,18 @@ public class CPU {
         this.i = 0x0000;
         this.display = display;
         this.keyboard = keyboard;
-
-        this.memory = memory;
         this.audio = audio;
+    }
+
+    public void attachMemory(Memory memory) {
+        this.display.clear();
+        this.delayTimer = 0;
+        this.soundTimer = 0;
+        this.registers = new int[16];
+        this.stack = new Stack<>();
+        this.pc = 0x0200;
+        this.i = 0x0000;
+        this.memory = memory;
     }
 
     public static int getBitValue(int value, int bitIndex) {
@@ -39,6 +48,10 @@ public class CPU {
     } 
 
     public void tick() {
+        if(this.memory == null) {
+            return;
+        }
+
         if(this.delayTimer > 0) {
             this.delayTimer--;
         }
