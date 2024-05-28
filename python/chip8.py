@@ -1,6 +1,12 @@
-import array as arr
 import sys, math, random, pygame
 from pygame.locals import *
+
+SCREEN_WIDTH = 64
+SCREEN_HEIGHT = 32
+SCALE = 10
+BLACK = 0, 0, 0
+WHITE = 255, 255, 255
+FRAME_TICKS = 16667
 
 class Memory:
     memory = bytearray(4096)
@@ -8,17 +14,18 @@ class Memory:
     def __init__(self, size):
         self.size = size
 
-    def set(self, address, value):
+    def loadRom(self, rom: bytearray):
+        for index in range(len(rom)):
+            self.set(0x200 + index, rom[index])
+
+    def set(self, address:int , value: int):
         self.memory[address] = value
 
-    def get(self, address):
+    def get(self, address: int):
         return self.memory[address]
-
-SCREEN_WIDTH = 64
-SCREEN_HEIGHT = 32
-SCALE = 10
-BLACK = 0, 0, 0
-WHITE = 255, 255, 255
+    
+    def getOpCode(self, pc: int) -> int:
+        return self.memory[pc] << 8 | self.memory[pc + 1]
 
 class Display:
     pixels = bytearray(SCREEN_WIDTH * SCREEN_HEIGHT)
@@ -31,8 +38,8 @@ class Display:
     def setPixel(self, x, y):
         self.pixels[x + (y * SCREEN_WIDTH)] ^= 1
 
-    def getPixel(self, x, y):
-        return self.pixels[x + (y * SCREEN_WIDTH)]
+    def getPixel(self, x, y) -> bool:
+        return self.pixels[x + (y * SCREEN_WIDTH)] == 1
 
     def setDrawFlag(self):
         self.drawFlag = True
@@ -51,8 +58,14 @@ class Sound:
     def __init__(self):
         pass
 
-    def play(self):
-        print("play sound")
+    def start(self):
+        print("start sound")
+
+    def stop(self):
+        print("stop sound")
+
+    def isPlaying() -> bool:
+        return False
 
 class Input:
     def __init__(self):
@@ -62,9 +75,49 @@ class Input:
         print("read input")
 
 class CPU:
-    def __init__(self, name, age):
+    memory: Memory
+    audio: Sound
+    soundTimer: int
+    delayTimer: int
+    pc: int
+
+    def __init__(self, name):
         self.name = name
-        self.age = age
+        self.soundTimer = 0
+        self.delayTimer = 0
+        pc = 0x200
+    
+    def attachMemory(self, memory: Memory):
+        self.memory = memory
     
     def doWork(self):
         print("do work " + self.name)
+
+    def tick(self):
+        if self.delayTimer > 0:
+            self.delayTimer -= 1
+        if self.soundTimer > 0:
+            self.soundTimer -= 1
+            if self.audio.isPlaying == False:
+                self.audio.start()
+        elif self.audio.isPlaying == True:
+            self.audio.stop()
+            
+        microseconds = FRAME_TICKS
+        delta = 0
+        while True:
+            delta = self.emulateCycle()
+            if microseconds <= 0 or delta == 0:
+                break
+
+    def emulateCycle(self) -> int:
+        opCode = self.memory.getOpCode(self.pc)
+        x = (opCode & 0x0F00) >> 8
+        y = (opCode & 0x00F0) >> 4
+        vx = self.memory.get(x)
+        vy = self.memory.get(y)
+        n = opCode & 0x000F
+        nn = opCode & 0x00FF
+        nnn = opCode & 0x0FFF
+        self.doWork()
+        return 0

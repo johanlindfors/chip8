@@ -23,10 +23,6 @@ def handle_input():
         #     if event.key == K_ESCAPE:
         #         sys.exit()              
 
-def update(cpu):
-    # updates here
-    cpu.doWork()
-
 def run():
     width = chip8.SCREEN_WIDTH * chip8.SCALE
     height = chip8.SCREEN_HEIGHT * chip8.SCALE
@@ -35,7 +31,7 @@ def run():
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
 
-    cpu = chip8.CPU("Johan", 50)
+    cpu = chip8.CPU("Johan")
     display = chip8.Display(64, 32)
     display.setPixel(10,10)
     display.setPixel(11,11)
@@ -45,7 +41,7 @@ def run():
     while True:
         clock.tick(FRAMES_PER_SECOND)
         handle_input()
-        update(cpu)
+        cpu.tick()
         display.draw(screen)
         pygame.display.flip()
 
