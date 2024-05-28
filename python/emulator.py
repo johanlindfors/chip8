@@ -1,13 +1,9 @@
 import sys, math, random, pygame
 from pygame.locals import *
 
-SCREEN_WIDTH = 64
-SCREEN_HEIGHT = 32
-SCALE = 10
-BLACK = 0, 0, 0
-RED = 255, 0, 0
-GREEN = 0, 255, 0
-FRAMES_PER_SECOND = 15
+import chip8
+
+FRAMES_PER_SECOND = 60
     
 def handle_input():
     for event in pygame.event.get():
@@ -27,28 +23,30 @@ def handle_input():
         #     if event.key == K_ESCAPE:
         #         sys.exit()              
 
-# def update():
-#     # updates here
-
-def draw(screen):
-    # clear screen
-    screen.fill(BLACK)
-    # draw screen
+def update(cpu):
+    # updates here
+    cpu.doWork()
 
 def run():
-    width = SCREEN_WIDTH * SCALE
-    height = SCREEN_HEIGHT * SCALE
+    width = chip8.SCREEN_WIDTH * chip8.SCALE
+    height = chip8.SCREEN_HEIGHT * chip8.SCALE
     size = width, height 
 
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
 
+    cpu = chip8.CPU("Johan", 50)
+    display = chip8.Display(64, 32)
+    display.setPixel(10,10)
+    display.setPixel(11,11)
+    display.setDrawFlag()
+
     pygame.init()
     while True:
         clock.tick(FRAMES_PER_SECOND)
         handle_input()
-        # update()
-        # draw(screen)
+        update(cpu)
+        display.draw(screen)
         pygame.display.flip()
 
 run()
