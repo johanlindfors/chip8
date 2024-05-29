@@ -2,5 +2,8 @@
     "files.exclude": {
         "**/target": true
     },
-    "rust-analyzer.check.command": "clippy"
+    "rust-analyzer.check.command": "clippy",
+    "rust-analyzer.runnables.extraArgs": [
+        "../resources/roms/IBM.ch8"
+    ]
 }
