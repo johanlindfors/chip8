@@ -1,4 +1,7 @@
 package se.programmeramera.chip8;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -9,11 +12,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.awt.event.ActionEvent;
 
 public class Emulator {
 
@@ -22,20 +20,15 @@ public class Emulator {
     private boolean isRunning;
     private CPU cpu;
 
-    public Emulator(String filename) {
-        createAndShowUI(filename);
-    }
-
     public static void main(String[] args) {
-        String filename = args[0];
-        new Emulator(filename);
+        new Emulator().createAndShowUI();
     }
 
     /**
      * Here we will create our swing UI as well as initialise and setup our
      * sprites, scene, and game loop and other buttons etc
      */
-    private void createAndShowUI(String filename) {
+    private void createAndShowUI() {
         JFrame frame = new JFrame("Chip8 Emulator");
         frame.setTitle("Chip8 Emulator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
